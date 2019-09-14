@@ -1,0 +1,64 @@
+@import '~@/assets/css/function.scss';
+.firstpage{
+    position: relative;
+    &-img{
+        height: 220px;
+        width: 100%;
+    }
+    &-title{
+        position: absolute;
+        top: 0.2rem;
+        left: 20px;
+        font-size: 16px
+    }
+    &-menu{
+        margin:20px;
+        height:100px;
+        border-radius:half(30px);
+        background-color: rgba(247, 247, 247, 1);
+        font-size: half(100px);
+        padding-top:1.5rem;
+    }
+    &-menu-img{
+        border-radius: 50%;
+        height: 2rem;
+        width: 2rem;
+    }
+    &-menu-title{
+        font-size: 0.8rem;
+    }
+}
+.secondpage{
+    .van-cell{
+        .van-cell__title{
+            text-align: left;
+        }
+    }
+    .van-cell-group{
+        margin-bottom: 0.5rem
+    }
+}
+.result{
+    &-buttom-top{
+        height: 300px;
+    }
+}
+.notice{
+  .allcontent{
+    text-align: left;
+    padding:10px 20px;
+    border-bottom: 1px solid rgba(198,198,198,0.5);
+    .titleText{
+      overflow: hidden;/*超出部分隐藏*/
+      text-overflow:ellipsis;/* 超出部分显示省略号 */
+      white-space: nowrap;/*规定段落中的文本不进行换行 */
+      width: 360;/*需要配合宽度来使用*/
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .time{
+        color: rgba(44,62,80,0.5);
+        font-size: 14px;
+    }
+  }
+}

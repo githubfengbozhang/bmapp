@@ -1,0 +1,60 @@
+<template>
+  <div>
+      <div></div>
+      <van-cell-group>
+        <van-field
+        value="张三"
+        label="考生姓名"
+        disabled
+        />
+        <van-field
+        value="201908240001"
+        label="班级"
+        disabled
+        />
+        <van-field
+        value="18423580000"
+        label="考生电话"
+        disabled
+        />
+        <van-field
+        value="二教学楼三教学楼四教学楼"
+        label="考试场地"
+        disabled
+        />
+        <van-field
+        value="2019-08-245:00"
+        label="考试时间"
+        disabled
+        />
+        <van-field
+        value="￥60.00元"
+        label="考试费用"
+        disabled
+        />
+        <van-field
+        value="无"
+        label="成绩属性"
+        disabled
+        />
+        <van-field
+        value="专升本"
+        label="成绩级别"
+        disabled
+        />
+        <van-field
+        value="原因描述"
+        label="报名失败"
+        disabled
+        />
+   </van-cell-group>
+  </div>
+</template>
+<script>
+export default {
+  name: 'result',
+  data () {
+    return {}
+  }
+}
+</script>
