@@ -33,6 +33,7 @@ import Vue from 'vue'
 import { List, PullRefresh, Divider } from 'vant'
 import { axiosGet } from '../../comment/http'
 import api from '../../comment/api'
+import qs from 'qs'
 // import qs from 'qs'
 Vue.use(List).use(PullRefresh).use(Divider)
 export default {
@@ -104,7 +105,7 @@ export default {
       this.$router.push({
         path: 'noticeDetail',
         query: {
-          id: activity && activity.id
+          content: qs.stringify(activity)
         }
       })
     }
