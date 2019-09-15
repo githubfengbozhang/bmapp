@@ -60,14 +60,15 @@ export default {
         })
     },
     toExamination () {
-      if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
-        this.$router.push({name: 'Examination'})
-      } else {
-        Dialog.alert({
-          title: '温馨提示',
-          message: '尚不能报考，请耐心等待...'
-        })
-      }
+      this.$router.push({name: 'Examination'})
+      // if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
+      //   this.$router.push({name: 'Examination'})
+      // } else {
+      //   Dialog.alert({
+      //     title: '温馨提示',
+      //     message: '尚不能报考，请耐心等待...'
+      //   })
+      // }
     }
   }
 }

@@ -7,6 +7,7 @@ const api = {
   getDict: `${server}/api/system/dict/getType`, // 数据字典
   checkExam: `${server}/api/school/exam/checkExam`, // 校验当前是否可以报考
   noticeDetail: `${server}/api/system/notice/detail`, // 查询公告信息
-  noticeList: `${server}/api/system/notice/list` // 查询公告信息
+  noticeList: `${server}/api/system/notice/list`, // 查询公告信息
+  examDetail: `${server}/api/school/exam/detail` // 报名基础信息
 }
 export default api

@@ -29,6 +29,21 @@
     }
 }
 .secondpage{
+    .van-cell__title{
+      position: relative;
+      margin: 0 auto;
+      width: 260px;
+      span{
+        position: absolute;
+        font-size: 16px;
+        top: 50%;
+        /* 这里有兼容性问题 */
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        -o-transform: translateY(-50%);
+        transform: translateY(-50%);
+      }
+    }
     .van-cell{
         .van-cell__title{
             text-align: left;
@@ -37,6 +52,12 @@
     .van-cell-group{
         margin-bottom: 0.5rem
     }
+    :global{
+        .van-icon{
+           line-height: 50px !important;
+           padding-left: 20px !important;
+        }
+     }
 }
 .result{
     &-buttom-top{

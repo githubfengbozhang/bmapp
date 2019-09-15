@@ -1,6 +1,24 @@
 <template>
   <div class='secondpage'>
-    <div></div>
+    <van-cell-group>
+      <van-uploader :after-read="onRead" :accept="'image/*'" :max-count="1">
+        <van-cell title="头像" right-icon="arrow" value="内容" >
+          <van-image
+            ref="goodsImg"
+            slot="default"
+            round
+            width="3rem"
+            height="3rem"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMkAAADJCAMAAAC+GOY3AAADAFBMVEVHcEzqoirujB3qqTXkoSexix/rsTzhmCXrsTbqni3umSHtmCPquzjujyHquznstkHujSHtnSfuih/vhRzqwTzuniDssTTrtjbunyPruTfsqzHvph3sqzDruzjtpCz648zqwTzsuz3xqg741b7rvzvqvzvtnCnvhBvunyHumSbtpyrvhx3ukiPqwDzqvzr3zKz1w5rJqJz3z6bwphDsrTLrtzfrujnruDfqwDv0q3zxrhLxsRLrvDn2wZjujSHwsg/ssTPujiDwsx/zxKzrujnqvjvtliXsqzDsqS/tnyrujyHrtTbspi7rtjfujSDrszXrtzftmSfruTjtoCvtoizuix/rsjTukyTruznrsTTviR7tlybqvTrrsDPvhx3tmCbtmijtmyjtnCnrrzPrtDbukiPrtDXtnSntoSvukSPqwTz78fLsoyzsrjL78vTulCTspC3srTLsrDHspy756+345en45+qYUCiCQyv56ezqvzuzXiWpWSb77/GsWyb34eXvgxv89vf89PXukCN4Piz67O735OfukCKKSCqQSymSTCmFRSr23+OIRir30Vn67e+bUSj402B/QiuiVSekViemVyf2zU99QSt6QCz23uL73oTvhRz1xz774Yr+9/j95JV1PCz0xTn0wi3zviLyvBv0xDPspS2NSiqMSSqUTimLSSqTTSmdUyiVTin++vqcUiieUyj3zlVzPC341Gb23OGgVCf41Wn51m352HD//v752XT62nf2ykf623v2y0r63H6uXCawXSX1yUP24eTxtw384o/zvyjxuhbrXl3+6aTxuRP95Zr12t/+5p3uiZK/bifRiSz1xpnDeClyOy3JgCv2z67ztG/yslL33NXxp0r208Pcmi/wmTP1wWTxpUDwq2H87uP2wFPh0M3tblbhoDCrhn31xoPxozbytZLtem6pZSqPYVb71o7mqjKGUUGec2i5mJD3xnL1vjm1cjDVwLvHqp+eXSvvil3zuCrOtK+aY0jvlHnytiK6kHXtez7xtA0z/A38AAAARHRSTlMALlYkEAM6CEcchWRsv35brHKX8/yztuOeo9HcmZDw/uje5eXVtc7axPDB6ePzy8OE8JjL9/nuxcbs8Pn6xNL+787737uwzQAAABFhSURB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"
+          />
+          <van-icon
+            slot="right-icon"
+            name="arrow"
+            style="line-height: inherit;"
+          />
+        </van-cell>
+      </van-uploader>
+    </van-cell-group>
     <van-cell-group>
       <van-field
         readonly
@@ -150,32 +168,32 @@
     </van-cell-group>
     <van-cell-group>
       <van-field
-      value="2019-08-24  15:00"
+      v-model="baseDate.texamBeginTime"
       label="考试时间"
       disabled
       />
       <van-field
-      value="二教学楼"
+      v-model="baseDate.cexamAddress"
       label="考试场地"
       disabled
       />
       <van-field
-      value="￥60.00元"
+      v-model="baseDate.cexamAddress"
       label="证书费用"
       disabled
       />
       <van-field
-      value="￥60.00元"
+      v-model="baseDate.cexamAddress"
       label="资料费用"
       disabled
       />
-       <van-field
-      value="￥60.00元"
+      <van-field
+      v-model="baseDate.cexamAddress"
       label="教材费用"
       disabled
       />
        <van-field
-      value="￥60.00元"
+      v-model="baseDate.cexamAddress"
       label="其他费用"
       disabled
       />
@@ -192,14 +210,22 @@
 </template>
 <script>
 import Vue from 'vue'
-import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast } from 'vant'
+import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader } from 'vant'
 import { axiosGet } from '../../comment/http'
 import axios from 'axios'
 import api from '../../comment/api'
-Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(ActionSheet)
+Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(ActionSheet)
 export default {
   data () {
     return {
+      baseDate: {
+        ninSchoolStudentPrice: '',
+        nnotInSchoolStudentPrice: '',
+        nsocialWorkersPrice: '',
+        ninSchoolWorkersPrice: '',
+        texamBeginTime: '',
+        cexamAddress: ''
+      },
       value: '',
       picker: false,
       pickerArea: false,
@@ -228,56 +254,75 @@ export default {
       pickerType: '',
       pickerAreaType: '',
       cExamTypeColumns: this.getgetDict('exam_type'),
-      cSexColumns: this.getgetDict('exam_type'),
+      cSexColumns: this.getgetDict('sys_user_sex'),
       cNationNoColumns: this.getgetDict('sign_nation'),
-      cOccupationColumns: [
-        {'keyId': 1, 'text': '学生'},
-        {'keyId': 2, 'text': '老师'}
-      ],
+      cOccupationColumns: this.getgetDict('exam_type'),
       cExamGradeColumns: this.getgetDict('sign_grade'),
       areaList: {
-        province_list: {
-          110000: '北京市',
-          120000: '天津市'
-        },
-        city_list: {
-          110100: '北京市',
-          110200: '县',
-          120100: '天津市',
-          120200: '县'
-        },
-        county_list: {
-          110101: '东城区',
-          110102: '西城区',
-          110105: '朝阳区',
-          110106: '丰台区',
-          120101: '和平区',
-          120102: '河东区',
-          120103: '河西区',
-          120104: '南开区',
-          120105: '河北区'
-        }
+        province_list: {},
+        city_list: {},
+        county_list: {}
       }
     }
   },
+  mounted () {
+    document.title = '立即报名'
+    this.getExamiaDetail()
+    this.getAreaList('0')
+  },
   methods: {
+    getAreaList (code) {
+      axiosGet(`${api.getArea}?code=${code}`)
+        .then((data) => {
+          data.data.map((item, index) => {
+            this.areaList.province_list[item.areaCode] = item.areaName
+            this.getCityList(item.areaCode)
+          })
+        })
+    },
+    getCityList (code) {
+      axiosGet(`${api.getArea}?code=${code}`)
+        .then((data) => {
+          data.data.map((item, index) => {
+            this.areaList.city_list[item.areaCode] = item.areaName
+            this.getCountyList(item.areaCode)
+          })
+        })
+    },
+    getCountyList (code) {
+      axiosGet(`${api.getArea}?code=${code}`)
+        .then((data) => {
+          data.data.map((item, index) => {
+            this.areaList.city_list[item.areaCode] = item.areaName
+          })
+        })
+    },
+    // 获取报名基本信息
+    getExamiaDetail () {
+      axiosGet(`${api.examDetail}`)
+        .then((data) => {
+          this.baseDate = {...data.data}
+        })
+    },
+    // 上传图片
+    onRead (file) {
+      console.log(file)
+      // 将原图片显示为选择的图片
+      this.$refs.goodsImg.src = file.content
+      console.log(file)
+    },
     getgetDict (type) {
-      let arrayList = []
       return axiosGet(`${api.getDict}?dictType=${type}`)
         .then((data) => {
           if (data.code === 0) {
-            let obj = {
-              dictLabel: '',
-              dictValue: ''
-            }
-            arrayList = data.data.map((item) => {
-              obj.dictLabel = item.dictLabel
-              obj.dictValue = item.dictValue
-              return obj
+            let arrayList = []
+            data.data.map((v, i) => {
+              arrayList.push({'text': v.dictLabel, 'value': v.dictValue})
             })
             switch (type) {
               case 'exam_type':
                 this.cExamTypeColumns = arrayList
+                this.cOccupationColumns = arrayList
                 break
               case 'sys_user_sex':
                 this.cSexColumns = arrayList
@@ -285,16 +330,12 @@ export default {
               case 'sign_nation':
                 this.cNationNoColumns = arrayList
                 break
-              case 'cOccupation':
-                this.cOccupationColumns = arrayList
-                break
               case 'sign_grade':
                 this.cExamGradeColumns = arrayList
                 break
               default :
                 return ''
             }
-            return arrayList
           } else {
             Toast.fail({mask: true}, '服务器出错请联系管理员')
           }
@@ -355,24 +396,24 @@ export default {
       this.picker = false
       switch (this.pickerType) {
         case 'cExamType':
-          this.cExamTypeText = picker.dictLabel
-          this.cExamType = picker.dictValue
+          this.cExamTypeText = picker.text
+          this.cExamType = picker.value
           break
         case 'cSex':
-          this.cSexText = picker.dictLabel
-          this.cSex = picker.dictValue
+          this.cSexText = picker.text
+          this.cSex = picker.value
           break
         case 'cNationNo':
-          this.cNationNoText = picker.dictLabel
-          this.cNationNo = picker.dictValue
+          this.cNationNoText = picker.text
+          this.cNationNo = picker.value
           break
         case 'cOccupation':
-          this.cOccupationText = picker.dictLabel
-          this.cOccupation = picker.dictValue
+          this.cOccupationText = picker.text
+          this.cOccupation = picker.value
           break
         case 'cExamGrade':
-          this.cExamGradeText = picker.dictLabel
-          this.cExamGrade = picker.dictValue
+          this.cExamGradeText = picker.text
+          this.cExamGrade = picker.value
           break
         default :
           return ''

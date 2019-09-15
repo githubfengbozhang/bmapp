@@ -52,8 +52,8 @@ export default {
         this.$toast('考生姓名不能为空')
         return false
       }
-      if (this.cIdCard === '') {
-        this.$toast('考生身份证不能为空')
+      if (this.cIdCard === '' || !(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(this.cIdCard))) {
+        this.$toast('请输入正确的身份证号')
         return false
       }
       if (this.cPhone === '' || !(/^1[3456789]\d{9}$/.test(this.cPhone))) {
