@@ -214,21 +214,25 @@ import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area
 import { axiosGet } from '../../comment/http'
 import axios from 'axios'
 import api from '../../comment/api'
+import qs from 'qs'
 Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(ActionSheet)
 export default {
   data () {
     return {
+      // 报名基础信息
       baseDate: {
-        ninSchoolStudentPrice: '',
-        nnotInSchoolStudentPrice: '',
-        nsocialWorkersPrice: '',
-        ninSchoolWorkersPrice: '',
-        texamBeginTime: '',
-        cexamAddress: ''
+        ninSchoolStudentPrice: '0',
+        nnotInSchoolStudentPrice: '0',
+        nsocialWorkersPrice: '0',
+        ninSchoolWorkersPrice: '0',
+        texamBeginTime: '0',
+        cexamAddress: '0'
       },
-      value: '',
+      // 单项选择器弹窗是否显示
       picker: false,
+      // 区域选择器弹窗是否显示
       pickerArea: false,
+      // 提交的数据
       cAddress: '',
       cWorkUnit: '',
       cBranchName: '',
@@ -236,7 +240,6 @@ export default {
       cDwellingplace: '',
       nZipCode: '',
       cStudentNo: '',
-      cSexText: '',
       pickColumns: '',
       cName: '',
       cIdCard: '',
@@ -245,19 +248,25 @@ export default {
       cOccupation: '',
       cSchoolName: '',
       cExamGrade: '',
+      // 图片
+      file: '',
+      // 下拉显示的值
+      cSexText: '',
       cExamGradeText: '',
       cBirthplaceText: '',
       cExamTypeText: '',
       cNationNoText: '',
       cOccupationText: '',
       cDwellingplaceText: '',
+      // 选择器的类别
       pickerType: '',
       pickerAreaType: '',
-      cExamTypeColumns: this.getgetDict('exam_type'),
-      cSexColumns: this.getgetDict('sys_user_sex'),
-      cNationNoColumns: this.getgetDict('sign_nation'),
-      cOccupationColumns: this.getgetDict('exam_type'),
-      cExamGradeColumns: this.getgetDict('sign_grade'),
+      // 选择器的下拉值
+      cExamTypeColumns: this.getDict('exam_type'),
+      cSexColumns: this.getDict('sys_user_sex'),
+      cNationNoColumns: this.getDict('sign_nation'),
+      cOccupationColumns: this.getDict('exam_type'),
+      cExamGradeColumns: this.getDict('sign_grade'),
       areaList: {
         province_list: {},
         city_list: {},
@@ -269,8 +278,10 @@ export default {
     document.title = '立即报名'
     this.getExamiaDetail()
     this.getAreaList('0')
+    console.log(this.areaList)
   },
   methods: {
+    // 获取省
     getAreaList (code) {
       axiosGet(`${api.getArea}?code=${code}`)
         .then((data) => {
@@ -280,6 +291,7 @@ export default {
           })
         })
     },
+    // 获取市级
     getCityList (code) {
       axiosGet(`${api.getArea}?code=${code}`)
         .then((data) => {
@@ -289,11 +301,12 @@ export default {
           })
         })
     },
+    // 获取乡
     getCountyList (code) {
       axiosGet(`${api.getArea}?code=${code}`)
         .then((data) => {
           data.data.map((item, index) => {
-            this.areaList.city_list[item.areaCode] = item.areaName
+            this.areaList.county_list[item.areaCode] = item.areaName
           })
         })
     },
@@ -306,12 +319,13 @@ export default {
     },
     // 上传图片
     onRead (file) {
-      console.log(file)
+      this.file = file
       // 将原图片显示为选择的图片
       this.$refs.goodsImg.src = file.content
       console.log(file)
     },
-    getgetDict (type) {
+    // 枚举下拉
+    getDict (type) {
       return axiosGet(`${api.getDict}?dictType=${type}`)
         .then((data) => {
           if (data.code === 0) {
@@ -365,10 +379,12 @@ export default {
           this.pickColumns = []
       }
     },
+    // 打开区域选择器
     openPickerArea (type) {
       this.pickerArea = true
       this.pickerAreaType = type
     },
+    // 选择区域确认
     pickerAreaConfirm (picker, value, index) {
       this.pickerArea = false
       let areaName = ''
@@ -392,7 +408,6 @@ export default {
     },
     // 单类选择器
     onConfirm (picker, value, index) {
-      this.value = value
       this.picker = false
       switch (this.pickerType) {
         case 'cExamType':
@@ -427,8 +442,85 @@ export default {
       // 点击选项时默认不会关闭菜单，可以手动关闭
       this.show = false
     },
+    verification () {
+      if (!this.cAddress) {
+        this.$toast('地址不能为空')
+        return false
+      } else if (!this.cWorkUnit) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cBranchName) {
+        this.$toast('部门名称不能为空')
+        return false
+      } else if (!this.cWorkUnit) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cDwellingplace) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.nZipCode) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cStudentNo) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cName) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cIdCard) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cPhone) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cNationNo) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cOccupation) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cSchoolName) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else if (!this.cExamGrade) {
+        this.$toast('工作单位不能为空')
+        return false
+      } else {
+        return true
+      }
+    },
+    // 提交
     save () {
-      axios.post(api.signUpSave, {})
+      if (!this.verification()) {
+        return
+      } 
+      let file = this.file
+      let formData = new FormData()
+      formData.append('file', file.content)
+      axios.post(`${api.upload}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+      axios.post(api.signUpSave, qs.parse({
+        cAddress: this.cAddress,
+        cWorkUnit: this.cWorkUnit,
+        cBranchName: this.cBranchName,
+        cBirthplace: this.cBirthplace,
+        cDwellingplace: this.cDwellingplace,
+        nZipCode: this.nZipCode,
+        cStudentNo: this.cStudentNo,
+        cName: this.cName,
+        cIdCard: this.cIdCard,
+        cPhone: this.cPhone,
+        cNationNo: this.cNationNo,
+        cOccupation: this.cOccupation,
+        cSchoolName: this.cSchoolName,
+        cExamGrade: this.cExamGrade
+      }))
     }
   }
 }
