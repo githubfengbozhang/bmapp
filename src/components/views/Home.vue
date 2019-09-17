@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     getcheckExam () {
-      axiosGet(`${api.checkExam}`)
+      axiosGet(`${api.checkExamDetail}`)
         .then((data) => {
           this.hasExaminationPlan = false
           window.sessionStorage.setItem('hasExaminationPlan', this.hasExaminationPlan)
