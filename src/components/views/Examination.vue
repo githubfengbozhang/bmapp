@@ -168,12 +168,7 @@
     </van-cell-group>
     <van-cell-group>
       <van-field
-      v-model="baseDate.texamBeginTime"
-      label="考试时间"
-      disabled
-      />
-      <van-field
-      v-model="baseDate.cexamAddress"
+      v-model="detail.cexamAddress"
       label="考试场地"
       disabled
       />
@@ -271,14 +266,16 @@ export default {
         province_list: {},
         city_list: {},
         county_list: {}
-      }
+      },
+      // 计划详情
+      detail: {}
     }
   },
   mounted () {
     document.title = '立即报名'
-    this.getExamiaDetail()
     this.getAreaList('0')
-    console.log(this.areaList)
+    this.detail = this.$route.params
+    console.log(this.detail)
   },
   methods: {
     // 获取省
@@ -308,13 +305,6 @@ export default {
           data.data.map((item, index) => {
             this.areaList.county_list[item.areaCode] = item.areaName
           })
-        })
-    },
-    // 获取报名基本信息
-    getExamiaDetail () {
-      axiosGet(`${api.examDetail}`)
-        .then((data) => {
-          this.baseDate = {...data.data}
         })
     },
     // 上传图片
@@ -493,7 +483,7 @@ export default {
     save () {
       if (!this.verification()) {
         return
-      } 
+      }
       let file = this.file
       let formData = new FormData()
       formData.append('file', file.content)

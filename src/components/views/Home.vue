@@ -36,7 +36,12 @@ export default {
   name: 'home',
   data () {
     return {
-      hasExaminationPlan: true
+      hasExaminationPlan: false,
+      cexamAddress: '',
+      ninSchoolStudentPrice: '',
+      ninSchoolWorkersPrice: '',
+      nnotInSchoolStudentPrice: '',
+      nexamId: ''
     }
   },
   mounted () {
@@ -47,20 +52,42 @@ export default {
     getcheckExam () {
       axiosGet(`${api.checkExamDetail}`)
         .then((data) => {
-          this.hasExaminationPlan = false
-          window.sessionStorage.setItem('hasExaminationPlan', this.hasExaminationPlan)
           if (data.code === 0) {
-            if (window.sessionStorage.getItem('hasExaminationPlan') === 'false') {
-              Dialog.alert({
-                title: '温馨提示',
-                message: '尚不能报考，请耐心等待...'
-              })
-            }
+            this.hasExaminationPlan = true
+            window.sessionStorage.setItem('hasExaminationPlan', this.hasExaminationPlan)
+            const {
+              cexamAddress,
+              ninSchoolStudentPrice,
+              ninSchoolWorkersPrice,
+              nnotInSchoolStudentPrice,
+              nexamId
+            } = data.data
+            this.cexamAddress = cexamAddress
+            this.ninSchoolStudentPrice = ninSchoolStudentPrice
+            this.ninSchoolWorkersPrice = ninSchoolWorkersPrice
+            this.nnotInSchoolStudentPrice = nnotInSchoolStudentPrice
+            this.nexamId = nexamId
+          } else {
+            this.hasExaminationPlan = true
+            window.sessionStorage.setItem('hasExaminationPlan', this.hasExaminationPlan)
+          }
+          if (window.sessionStorage.getItem('hasExaminationPlan') === 'false') {
+            Dialog.alert({
+              title: '温馨提示',
+              message: '尚不能报考，请耐心等待...'
+            })
           }
         })
     },
     toExamination () {
-      this.$router.push({name: 'Examination'})
+      const data = {
+        cexamAddress: this.cexamAddress,
+        ninSchoolStudentPrice: this.ninSchoolStudentPrice,
+        ninSchoolWorkersPrice: this.ninSchoolWorkersPrice,
+        nnotInSchoolStudentPrice: this.nnotInSchoolStudentPrice,
+        nexamId: this.nexamId
+      }
+      this.$router.push({name: 'Examination', params: data})
       // if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
       //   this.$router.push({name: 'Examination'})
       // } else {
