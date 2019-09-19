@@ -24,7 +24,7 @@
         />
     </van-cell-group>
     <div class="result-buttom-top"></div>
-    <van-button type="info" size='large' @click="query()">立即查询</van-button>
+    <van-button type="info" :loading = 'loadingShow' size='large' @click="query()">立即查询</van-button>
     </div>
 </template>
 <script>
@@ -40,7 +40,8 @@ export default {
     return {
       cIdCard: '',
       cName: '',
-      cPhone: ''
+      cPhone: '',
+      loadingShow: false
     }
   },
   mounted () {
@@ -60,25 +61,22 @@ export default {
         this.$toast('请输入正确的手机号码')
         return false
       }
-      axiosPost(`${api.querySignUp}`, qs.parse({
+      this.loadingShow = true
+      axiosPost(`${api.querySignUp}`, qs.stringify({
         cName: this.cName,
         cIdCard: this.cIdCard,
         cPhone: this.cPhone
       }))
         .then((data) => {
+          this.loadingShow = false
           if (data.code === 0) {
-            if (data.signUpParamEntity) {
-              Dialog.alert({
-                title: '温馨提示',
-                message: '暂未查询到您的报考信息'
-              })
-                .then(() => {
-                  // on close
-                })
-            }
             this.$router.push({name: 'Result', params: data})
           } else {
             this.$toast(data.msg)
+            Dialog.alert({
+              title: '温馨提示',
+              message: data.msg
+            })
           }
         })
     }

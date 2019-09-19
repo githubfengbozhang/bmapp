@@ -9,6 +9,7 @@ const api = {
   checkExamDetail: `${server}/api/school/exam/detail`, // 获取当前可报考的考试计划
   noticeDetail: `${server}/api/system/notice/detail`, // 查询公告信息
   noticeList: `${server}/api/system/notice/list`, // 查询公告信息
-  examDetail: `${server}/api/school/exam/detail` // 报名基础信息
+  examDetail: `${server}/api/school/exam/detail`, // 报名基础信息
+  createOrder: `${server}/api/school/order/createOrder`
 }
 export default api

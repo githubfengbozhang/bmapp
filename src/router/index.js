@@ -7,7 +7,7 @@ import QueryResult from '@/components/views/QueryResult'
 import Result from '@/components/views/Result'
 import Notice from '@/components/views/Notice'
 import NoticeDetail from '@/components/views/NoticeDetail'
-
+import Pay from '@/components/views/Pay'
 Vue.use(Router)
 
 export default new Router({
@@ -16,30 +16,41 @@ export default new Router({
       path: '/',
       name: 'HelloWorld',
       component: HelloWorld
-    }, {
+    },
+    {
       path: '/home',
       name: 'Home',
       component: Home
-    }, {
+    },
+    {
       path: '/examination',
       name: 'Examination',
       component: Examination
-    }, {
+    },
+    {
       path: '/queryResult',
       name: 'QueryResult',
       component: QueryResult
-    }, {
+    },
+    {
       path: '/result',
       name: 'Result',
       component: Result
-    }, {
+    },
+    {
       path: '/notice',
       name: 'Notice',
       component: Notice
-    }, {
+    },
+    {
       path: '/noticeDetail',
       name: 'NoticeDetail',
       component: NoticeDetail
+    },
+    {
+      path: '/pay',
+      name: 'Pay',
+      component: Pay
     }
   ]
 })

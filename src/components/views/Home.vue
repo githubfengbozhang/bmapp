@@ -68,7 +68,7 @@ export default {
             this.nnotInSchoolStudentPrice = nnotInSchoolStudentPrice
             this.nexamId = nexamId
           } else {
-            this.hasExaminationPlan = true
+            this.hasExaminationPlan = false
             window.sessionStorage.setItem('hasExaminationPlan', this.hasExaminationPlan)
           }
           if (window.sessionStorage.getItem('hasExaminationPlan') === 'false') {
@@ -88,14 +88,14 @@ export default {
         nexamId: this.nexamId
       }
       this.$router.push({name: 'Examination', params: data})
-      // if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
-      //   this.$router.push({name: 'Examination'})
-      // } else {
-      //   Dialog.alert({
-      //     title: '温馨提示',
-      //     message: '尚不能报考，请耐心等待...'
-      //   })
-      // }
+      if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
+        this.$router.push({name: 'Examination'})
+      } else {
+        Dialog.alert({
+          title: '温馨提示',
+          message: '尚不能报考，请耐心等待...'
+        })
+      }
     }
   }
 }

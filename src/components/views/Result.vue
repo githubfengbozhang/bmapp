@@ -3,43 +3,38 @@
       <div></div>
       <van-cell-group>
         <van-field
-        value="张三"
+        v-model="cname"
         label="考生姓名"
         disabled
         />
         <van-field
-        value="201908240001"
-        label="班级"
+        v-model="sex"
+        label="性别"
         disabled
         />
         <van-field
-        value="18423580000"
+        v-model="cphone"
         label="考生电话"
         disabled
         />
         <van-field
-        value="二教学楼三教学楼四教学楼"
+        v-model="address"
         label="考试场地"
         disabled
         />
         <van-field
-        value="2019-08-245:00"
-        label="考试时间"
+        v-model="payStatusName"
+        label="缴费状态"
         disabled
         />
         <van-field
-        value="￥60.00元"
-        label="考试费用"
+        v-model="statusName"
+        label="报名状态"
         disabled
         />
         <van-field
-        value="无"
-        label="成绩属性"
-        disabled
-        />
-        <van-field
-        value="专升本"
-        label="成绩级别"
+        v-model="examType"
+        label="考试类别"
         disabled
         />
         <van-field
@@ -54,7 +49,27 @@
 export default {
   name: 'result',
   data () {
-    return {}
+    return {
+      cname: '',
+      sex: '',
+      cphone: '',
+      address: '',
+      payStatusName: '',
+      statusName: '',
+      examType: '',
+      data: {}
+    }
+  },
+  mounted () {
+    document.title = '报名查询结果'
+    this.data = this.$route.params
+    this.cname = this.data.cname
+    this.sex = this.data.params.sex
+    this.cphone = this.data.cphone
+    this.address = this.data.params.address
+    this.payStatusName = this.data.params.payStatusName
+    this.statusName = this.data.params.statusName
+    this.examType = this.data.params.examType
   }
 }
 </script>
