@@ -87,9 +87,8 @@ export default {
         nnotInSchoolStudentPrice: this.nnotInSchoolStudentPrice,
         nexamId: this.nexamId
       }
-      this.$router.push({name: 'Examination', params: data})
       if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
-        this.$router.push({name: 'Examination'})
+        this.$router.push({name: 'Examination', params: data})
       } else {
         Dialog.alert({
           title: '温馨提示',

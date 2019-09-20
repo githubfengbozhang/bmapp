@@ -21,6 +21,23 @@
     </van-cell-group>
     <van-cell-group>
       <van-field
+        v-model="cIdCard"
+        label="身份证号"
+        placeholder="请输入考生身份证号码"
+        clearable
+        required
+        disabled
+        @blur='ok()'
+        @touchstart.native.stop="numberShow = true"
+      />
+      <van-number-keyboard
+        v-model="cIdCard"
+        :show="numberShow"
+        :maxlength="18"
+        safe-area-inset-bottom = true
+        @blur="numberShow = false"
+      />
+      <van-field
         readonly
         clickable
         :value="cExamTypeText"
@@ -51,13 +68,6 @@
         label="考生性别"
         placeholder="请选择考生性别"
         @click="openPicker('cSex')"
-        required
-      />
-      <van-field
-        v-model="cIdCard"
-        label="身份证号"
-        placeholder="请输入考生身份证号码"
-        clearable
         required
       />
       <van-field
@@ -184,7 +194,7 @@
       disabled
       />
    </van-cell-group>
-   <van-button type="info" :loading = 'loadingShow' size='large' @click="save()">考试报名</van-button>
+   <van-button type="info" :loading = 'loadingShow' loading-text="报名进行中..." size='large' @click="save()">考试报名</van-button>
    <!-- <van-action-sheet
       v-model="show"
       :actions="actions"
@@ -196,16 +206,17 @@
 </template>
 <script>
 import Vue from 'vue'
-import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader } from 'vant'
+import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader, Dialog, NumberKeyboard } from 'vant'
 import { axiosGet } from '../../comment/http'
-import numberFormat from '../../uilt/momey'
+import numberFormat from '@uilt/momey'
 import axios from 'axios'
 import api from '../../comment/api'
 import qs from 'qs'
-Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(ActionSheet)
+Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(Dialog).use(NumberKeyboard).use(ActionSheet)
 export default {
   data () {
     return {
+      numberShow: false,
       // 按钮是否加载中
       loadingShow: false,
       // 根据学生类别下拉显示不同缴费
@@ -281,6 +292,16 @@ export default {
     console.log(this.detail)
   },
   methods: {
+    ok () {
+      Dialog.confirm({
+        title: '提示',
+        message: '您已有该考试计划的报名信息，是否重新填写？'
+      }).then(() => {
+      // on confirm
+      }).catch(() => {
+      // on cancel
+      })
+    },
     // 获取省
     getAreaList (code) {
       axiosGet(`${api.getArea}?code=${code}`)

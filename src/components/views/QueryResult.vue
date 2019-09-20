@@ -2,29 +2,46 @@
     <div>
       <van-cell-group>
         <van-field
+          :value="planText"
+          clickable
+          label="考试计划"
+          placeholder="请选择考试计划"
+          @click="openPicker('cOccupation')"
+          required
+          disabled
+        />
+        <van-field
             v-model="cName"
             required
             clearable
             label="考生姓名"
-            placeholder="请输入考生班级"
+            placeholder="请输入考生姓名"
         />
         <van-field
             v-model="cIdCard"
             label="身份证号"
-            placeholder="请输入学生证学号"
+            placeholder="请输入身份证号"
             clearable
             required
         />
         <van-field
             v-model="cPhone"
             label="考生电话"
-            placeholder="请输入考生联系电话"
+            placeholder="请输入考生电话"
             clearable
             required
         />
+        <van-popup v-model="picker" position="bottom">
+          <van-picker
+          show-toolbar
+          :columns="pickColumns"
+          @cancel="picker = false"
+          @confirm="onConfirm"
+        />
+        </van-popup>
     </van-cell-group>
     <div class="result-buttom-top"></div>
-    <van-button type="info" :loading = 'loadingShow' size='large' @click="query()">立即查询</van-button>
+    <van-button type="info" :loading = 'loadingShow' loading-text="信息查询中..." size='large' @click="query()">立即查询</van-button>
     </div>
 </template>
 <script>
@@ -38,16 +55,30 @@ export default {
   name: 'result',
   data () {
     return {
+      picker: false,
       cIdCard: '',
       cName: '',
       cPhone: '',
-      loadingShow: false
+      pickColumns: '',
+      loadingShow: false,
+      planText: '2018年计划'
     }
   },
   mounted () {
     document.title = '报考结果查询'
+    this.pickColumns = [{
+      text: '2018年计划',
+      value: '1'
+    },
+    {
+      text: '2019年计划',
+      value: '2'
+    }]
   },
   methods: {
+    openPicker () {
+      this.picker = true
+    },
     query () {
       if (this.cName === '') {
         this.$toast('考生姓名不能为空')
@@ -70,7 +101,7 @@ export default {
         .then((data) => {
           this.loadingShow = false
           if (data.code === 0) {
-            this.$router.push({name: 'Result', params: data})
+            this.$router.push({name: 'Result', params: data.data})
           } else {
             this.$toast(data.msg)
             Dialog.alert({
