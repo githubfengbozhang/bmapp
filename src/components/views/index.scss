@@ -29,6 +29,15 @@
     }
 }
 .secondpage{
+    .idCardIcon{
+      position: absolute;
+      top: -4px;
+      right: 20px;
+      z-index: 9999999;
+    }
+    .van-cell-group{
+      position: relative;
+    }
     .van-cell__title{
       position: relative;
       margin: 0 auto;

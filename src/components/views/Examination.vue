@@ -20,6 +20,24 @@
       </van-uploader>
     </van-cell-group>
     <van-cell-group>
+      <van-icon name="search" class="idCardIcon" @click="idCardSearch()"/>
+      <van-field
+        v-model="cIdCard"
+        label="身份证号"
+        placeholder="请输入考生身份证号码"
+        clearable
+        required
+        disabled
+        @touchstart.native.stop="numberShow = true"
+      />
+      <van-number-keyboard
+        v-model="cIdCard"
+        :show="numberShow"
+        extra-key="x"
+        :maxlength="18"
+        safe-area-inset-bottom = true
+        @blur="numberShow = false"
+      />
       <van-field
         readonly
         clickable
@@ -51,13 +69,6 @@
         label="考生性别"
         placeholder="请选择考生性别"
         @click="openPicker('cSex')"
-        required
-      />
-      <van-field
-        v-model="cIdCard"
-        label="身份证号"
-        placeholder="请输入考生身份证号码"
-        clearable
         required
       />
       <van-field
@@ -128,7 +139,7 @@
         required
       />
       <van-field
-        v-model="cWorkUnit "
+        v-model="cWorkUnit"
         label="工作单位"
         placeholder="请输入工作单位"
         clearable
@@ -184,7 +195,7 @@
       disabled
       />
    </van-cell-group>
-   <van-button type="info" :loading = 'loadingShow' size='large' @click="save()">考试报名</van-button>
+   <van-button type="info" :loading = 'loadingShow' loading-text="报名进行中..." size='large' @click="save()">考试报名</van-button>
    <!-- <van-action-sheet
       v-model="show"
       :actions="actions"
@@ -196,16 +207,17 @@
 </template>
 <script>
 import Vue from 'vue'
-import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader } from 'vant'
+import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader, Dialog, NumberKeyboard } from 'vant'
 import { axiosGet } from '../../comment/http'
-import numberFormat from '../../uilt/momey'
+import numberFormat from '@uilt/momey'
 import axios from 'axios'
 import api from '../../comment/api'
 import qs from 'qs'
-Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(ActionSheet)
+Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(Dialog).use(NumberKeyboard).use(ActionSheet)
 export default {
   data () {
     return {
+      numberShow: false,
       // 按钮是否加载中
       loadingShow: false,
       // 根据学生类别下拉显示不同缴费
@@ -222,6 +234,8 @@ export default {
       picker: false,
       // 区域选择器弹窗是否显示
       pickerArea: false,
+      // 下拉赋值
+      pickColumns: '',
       // 提交的数据
       cAddress: '',
       cSex: '',
@@ -231,9 +245,8 @@ export default {
       cDwellingplace: '',
       nZipCode: '',
       cStudentNo: '',
-      pickColumns: '',
       cName: '',
-      cIdCard: '',
+      cIdCard: '652922199008036050',
       cPhone: '',
       cNationNo: '',
       cOccupation: '',
@@ -277,38 +290,108 @@ export default {
     this.nnotInSchoolStudentPrice = numberFormat(this.detail.nnotInSchoolStudentPrice)
     this.ninSchoolWorkersPrice = numberFormat(this.detail.ninSchoolWorkersPrice)
     this.cexamAddress = this.detail.cexamAddress
-    this.nExamId = this.detail.nExamId
-    console.log(this.detail)
+    this.nExamId = this.detail.nexamId
   },
   methods: {
+    // 下拉默认值渲染cExamType
+    pickerCExamTypeValue (value) {
+      let newData = this.cExamTypeColumns.filter((item) => {
+        if (item.value === value) {
+          return item
+        }
+      })
+      console.log(newData)
+      return newData
+    },
+    pickerCSexValue (value) {
+      let newData = this.cSexColumns.filter((item) => {
+        if (item.value === value) {
+          return item
+        }
+      })
+      console.log(newData)
+      return newData
+    },
+    pickerCNationNoValue (value) {
+      let newData = this.cNationNoColumns.filter((item) => {
+        if (item.value === value) {
+          return item
+        }
+      })
+      console.log(newData)
+      return newData
+    },
+    pickerPlaceValue (area, city, province) {
+      console.log(this.areaList)
+      let provinceList = this.areaList.province_list[province]
+      let cityList = this.areaList.city_list[city]
+      let countyList = this.areaList.county_list[area]
+      return provinceList + cityList + countyList
+    },
+    // 身份证查询信息
+    idCardSearch () {
+      axios.post(`${api.querySignUpByCardId}?cIdCard=${this.cIdCard}&nExamId=${this.nExamId}`)
+        .then((data) => {
+          if (data.data.code === 0) {
+            Dialog.confirm({
+              title: '提示',
+              message: '您已有该考试计划的报名信息，是否重新填写？'
+            }).then(() => {
+              this.cAddress = data.data.data.caddress
+              this.cSexText = this.pickerCSexValue(data.data.data.csex)[0].text
+              this.cSex = data.data.data.csex
+              this.cWorkUnit = data.data.data.cworkUnit
+              this.cBranchName = data.data.data.cbranchName
+              this.cBirthplace = data.data.data.cAddress
+              this.cDwellingplace = data.data.data.cdwellingplace
+              this.nZipCode = data.data.data.nzipCode
+              this.cStudentNo = data.data.data.cstudentNo
+              this.cName = data.data.data.cname
+              this.cIdCard = data.data.data.cidCard
+              this.cPhone = data.data.data.cphone
+              this.cNationNoText = this.pickerCNationNoValue(data.data.data.cnationNo)[0].text
+              this.cNationNo = data.data.data.cnationNo
+              this.cOccupation = data.data.data.coccupation
+              this.cOccupationText = this.pickerCExamTypeValue(data.data.data.coccupation)[0].text
+              this.cSchoolName = data.data.data.cschoolName
+              this.cExamGrade = data.data.data.cexamGrade
+              this.file = data.data.data.cidCardImg
+              this.cExamType = data.data.data.cexamType
+              this.cExamTypeText = this.pickerCExamTypeValue(data.data.data.cexamType)[0].text
+              this.cBirthArea = data.data.data.cbirthArea
+              this.cBirthCity = data.data.data.cbirthCity
+              this.cBirthProvince = data.data.data.cbirthProvince
+              this.cBirthplaceText = this.pickerPlaceValue(data.data.data.cbirthArea, data.data.data.cbirthCity, data.data.data.cbirthProvince)
+              this.cDwellingplaceText = this.pickerPlaceValue(data.data.data.cnowArea, data.data.data.cnowCity, data.data.data.cnowProvince)
+            }).catch(() => {
+            })
+          }
+        })
+    },
     // 获取省
     getAreaList (code) {
       axiosGet(`${api.getArea}?code=${code}`)
         .then((data) => {
           data.data.map((item, index) => {
             this.areaList.province_list[item.areaCode] = item.areaName
-            this.getCityList(item.areaCode)
+            this.getAreaChild(item.areaCode)
           })
         })
     },
-    // 获取市级
-    getCityList (code) {
-      axiosGet(`${api.getArea}?code=${code}`)
+    getAreaChild (code) {
+      axiosGet(`${api.getAreaChild}?code=${code}`)
         .then((data) => {
           data.data.map((item, index) => {
-            this.areaList.city_list[item.areaCode] = item.areaName
-            this.getCountyList(item.areaCode)
+            this.areaList.city_list[item.id] = item.name
+            this.getCountyList(item.children ? item.children : [])
           })
         })
     },
     // 获取乡
-    getCountyList (code) {
-      axiosGet(`${api.getArea}?code=${code}`)
-        .then((data) => {
-          data.data.map((item, index) => {
-            this.areaList.county_list[item.areaCode] = item.areaName
-          })
-        })
+    getCountyList (children) {
+      children.map((item, index) => {
+        this.areaList.county_list[item.id] = item.name
+      })
     },
     // 枚举下拉
     getDict (type) {

@@ -2,35 +2,52 @@
     <div>
       <van-cell-group>
         <van-field
+          :value="nExamText"
+          clickable
+          label="考试计划"
+          placeholder="请选择考试计划"
+          @click="openPicker('cOccupation')"
+          required
+          disabled
+        />
+        <van-field
             v-model="cName"
             required
             clearable
             label="考生姓名"
-            placeholder="请输入考生班级"
+            placeholder="请输入考生姓名"
         />
         <van-field
             v-model="cIdCard"
             label="身份证号"
-            placeholder="请输入学生证学号"
+            placeholder="请输入身份证号"
             clearable
             required
         />
         <van-field
             v-model="cPhone"
             label="考生电话"
-            placeholder="请输入考生联系电话"
+            placeholder="请输入考生电话"
             clearable
             required
         />
+        <van-popup v-model="picker" position="bottom">
+          <van-picker
+          show-toolbar
+          :columns="pickColumns"
+          @cancel="picker = false"
+          @confirm="onConfirm"
+        />
+        </van-popup>
     </van-cell-group>
     <div class="result-buttom-top"></div>
-    <van-button type="info" :loading = 'loadingShow' size='large' @click="query()">立即查询</van-button>
+    <van-button type="info" :loading = 'loadingShow' loading-text="信息查询中..." size='large' @click="query()">立即查询</van-button>
     </div>
 </template>
 <script>
 import Vue from 'vue'
 import { Cell, CellGroup, Image, Field, Button, ActionSheet, Toast, Dialog } from 'vant'
-import { axiosPost } from '../../comment/http'
+import { axiosPost, axiosGet } from '../../comment/http'
 import api from '../../comment/api'
 import qs from 'qs'
 Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Toast).use(Dialog).use(ActionSheet)
@@ -38,16 +55,41 @@ export default {
   name: 'result',
   data () {
     return {
+      picker: false,
       cIdCard: '',
       cName: '',
       cPhone: '',
-      loadingShow: false
+      pickColumns: [],
+      loadingShow: false,
+      nExamText: '',
+      nExamId: ''
     }
+  },
+  created () {
+    this.getAllExam()
   },
   mounted () {
     document.title = '报考结果查询'
   },
   methods: {
+    getAllExam () {
+      axiosGet(`${api.allExam}`)
+        .then((data) => {
+          if (data.code === 0) {
+            data.data.map((item) => {
+              this.pickColumns.push({'text': item.dictLabel, 'value': item.dictValue})
+            })
+          }
+        })
+    },
+    openPicker () {
+      this.picker = true
+    },
+    onConfirm (picker, value, index) {
+      this.picker = false
+      this.nExamText = picker.text
+      this.nExamId = picker.value
+    },
     query () {
       if (this.cName === '') {
         this.$toast('考生姓名不能为空')
@@ -65,12 +107,13 @@ export default {
       axiosPost(`${api.querySignUp}`, qs.stringify({
         cName: this.cName,
         cIdCard: this.cIdCard,
-        cPhone: this.cPhone
+        cPhone: this.cPhone,
+        nExamId: this.nExamId
       }))
         .then((data) => {
           this.loadingShow = false
           if (data.code === 0) {
-            this.$router.push({name: 'Result', params: data})
+            this.$router.push({name: 'Result', params: data.data})
           } else {
             this.$toast(data.msg)
             Dialog.alert({

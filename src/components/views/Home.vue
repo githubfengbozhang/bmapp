@@ -71,7 +71,7 @@ export default {
             this.hasExaminationPlan = false
             window.sessionStorage.setItem('hasExaminationPlan', this.hasExaminationPlan)
           }
-          if (window.sessionStorage.getItem('hasExaminationPlan') === 'false') {
+          if (JSON.parse(window.sessionStorage.getItem('hasExaminationPlan'))) {
             Dialog.alert({
               title: '温馨提示',
               message: '尚不能报考，请耐心等待...'
@@ -87,9 +87,8 @@ export default {
         nnotInSchoolStudentPrice: this.nnotInSchoolStudentPrice,
         nexamId: this.nexamId
       }
-      this.$router.push({name: 'Examination', params: data})
-      if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
-        this.$router.push({name: 'Examination'})
+      if (JSON.parse(window.sessionStorage.getItem('hasExaminationPlan'))) {
+        this.$router.push({name: 'Examination', params: data})
       } else {
         Dialog.alert({
           title: '温馨提示',
