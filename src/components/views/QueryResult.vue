@@ -2,7 +2,7 @@
     <div>
       <van-cell-group>
         <van-field
-          :value="planText"
+          :value="nExamText"
           clickable
           label="考试计划"
           placeholder="请选择考试计划"
@@ -47,7 +47,7 @@
 <script>
 import Vue from 'vue'
 import { Cell, CellGroup, Image, Field, Button, ActionSheet, Toast, Dialog } from 'vant'
-import { axiosPost } from '../../comment/http'
+import { axiosPost, axiosGet } from '../../comment/http'
 import api from '../../comment/api'
 import qs from 'qs'
 Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Toast).use(Dialog).use(ActionSheet)
@@ -59,25 +59,36 @@ export default {
       cIdCard: '',
       cName: '',
       cPhone: '',
-      pickColumns: '',
+      pickColumns: [],
       loadingShow: false,
-      planText: '2018年计划'
+      nExamText: '',
+      nExamId: ''
     }
+  },
+  created () {
+    this.getAllExam()
   },
   mounted () {
     document.title = '报考结果查询'
-    this.pickColumns = [{
-      text: '2018年计划',
-      value: '1'
-    },
-    {
-      text: '2019年计划',
-      value: '2'
-    }]
   },
   methods: {
+    getAllExam () {
+      axiosGet(`${api.allExam}`)
+        .then((data) => {
+          if (data.code === 0) {
+            data.data.map((item) => {
+              this.pickColumns.push({'text': item.dictLabel, 'value': item.dictValue})
+            })
+          }
+        })
+    },
     openPicker () {
       this.picker = true
+    },
+    onConfirm (picker, value, index) {
+      this.picker = false
+      this.nExamText = picker.text
+      this.nExamId = picker.value
     },
     query () {
       if (this.cName === '') {
@@ -96,7 +107,8 @@ export default {
       axiosPost(`${api.querySignUp}`, qs.stringify({
         cName: this.cName,
         cIdCard: this.cIdCard,
-        cPhone: this.cPhone
+        cPhone: this.cPhone,
+        nExamId: this.nExamId
       }))
         .then((data) => {
           this.loadingShow = false
