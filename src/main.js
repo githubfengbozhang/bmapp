@@ -4,8 +4,11 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import moment from 'moment'
+import VConsole from 'vconsole'
 Vue.config.productionTip = false
 Vue.prototype.$moment = moment
+
+Vue.prototype.$vConsole = new VConsole()
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -54,6 +54,7 @@ export default {
     document.title = '报名考试系统'
     this.getcheckExam() // 是否可以报考
     this.isStudent() // 学生进入是什么身份
+    console.log(`function_id:${this.function_id},authTime:${this.authTime},ticket:${this.ticket},userid:${this.userid}`)
   },
   methods: {
     isStudent () {
