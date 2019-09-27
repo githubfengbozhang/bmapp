@@ -1,5 +1,5 @@
 // const server = 'http://121.196.200.183:8080/school'
-const server = 'http://172.99.247.116:9292'
+const server = 'http://183.230.255.84:9292/pth'
 const api = {
   signUpSave: `${server}/api/school/sign/save`, // 新增报名信息
   querySignUp: `${server}/api/school/sign/querySignUp`, // 报名信息查询
@@ -14,6 +14,7 @@ const api = {
   examDetail: `${server}/api/school/exam/detail`, // 报名基础信息
   createOrder: `${server}/api/school/order/createOrder`, // 获取订单号
   allExam: `${server}/api/school/exam/allExam`, // 获取全部考试计划下拉选项
-  querySignUpByCardId: `${server}/api/school/sign/querySignUpByCardId` // 通过身份证号码查询报名信息
+  querySignUpByCardId: `${server}/api/school/sign/querySignUpByCardId`, // 通过身份证号码查询报名信息
+  login: `${server}/api/school/single/login` // 学生登录获取信息
 }
 export default api

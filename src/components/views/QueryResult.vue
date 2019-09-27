@@ -79,6 +79,12 @@ export default {
             data.data.map((item) => {
               this.pickColumns.push({'text': item.dictLabel, 'value': item.dictValue})
             })
+            data.data.map((item, index) => {
+              if (index === 0) {
+                this.nExamText = item.dictLabel
+                this.nExamId = item.dictValue
+              }
+            })
           }
         })
     },
@@ -126,5 +132,11 @@ export default {
   }
 }
 </script>
+<style>
+  .van-field__control:disabled {
+    color: #2a2a2a !important;
+    -webkit-text-fill-color: #2a2a2a !important;
+  }
+</style>
 <style lang="scss" scoped src="./index.scss">
 </style>

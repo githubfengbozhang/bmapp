@@ -4,12 +4,11 @@
       <van-uploader :after-read="onRead" :accept="'image/*'" :max-count="1">
         <van-cell title="头像" right-icon="arrow" value="内容" >
           <van-image
-            ref="goodsImg"
             slot="default"
             round
             width="3rem"
             height="3rem"
-            :src="file"
+            :src="cIdCardImg"
           />
           <van-icon
             slot="right-icon"
@@ -22,6 +21,7 @@
     <van-cell-group>
       <van-icon name="search" class="idCardIcon" @click="idCardSearch()"/>
       <van-field
+        class = 'inputSearch'
         v-model="cIdCard"
         label="身份证号"
         placeholder="请输入考生身份证号码"
@@ -158,14 +158,14 @@
         placeholder="请输入所在院系"
         clearable
       />
-      <van-field
+      <!-- <van-field
         readonly
         clickable
         :value="cExamGradeText"
         label="报考级别"
         placeholder="请选择报考级别"
         @click="openPicker('cExamGrade')"
-      />
+      /> -->
       <van-field
         v-model="nZipCode"
         label="邮编"
@@ -203,6 +203,7 @@
       @select="onSelect"
       @cancel="onCancel"
     /> -->
+  <van-popup v-model="overlayShow"><van-loading size="24px">加载中...</van-loading></van-popup>
   </div>
 </template>
 <script>
@@ -217,6 +218,8 @@ Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(P
 export default {
   data () {
     return {
+      overlayShow: false,
+      // 键盘显示
       numberShow: false,
       // 按钮是否加载中
       loadingShow: false,
@@ -230,6 +233,8 @@ export default {
       nnotInSchoolStudentPrice: '',
       ninSchoolWorkersPrice: '',
       cexamAddress: '',
+      // 学生端是否是在校生
+      inSchStudent: '',
       // 单项选择器弹窗是否显示
       picker: false,
       // 区域选择器弹窗是否显示
@@ -246,19 +251,18 @@ export default {
       nZipCode: '',
       cStudentNo: '',
       cName: '',
-      cIdCard: '652922199008036050',
+      cIdCard: '',
       cPhone: '',
       cNationNo: '',
       cOccupation: '',
       cSchoolName: '',
-      cExamGrade: '',
-      cIdCardImg: '',
-      cExamType: '',
+      // cExamGrade: '',
       // 图片
-      file: require('../../assets/touxiang.png'),
+      cIdCardImg: require('../../assets/touxiang.png'),
+      cExamType: '',
       // 下拉显示的值
       cSexText: '',
-      cExamGradeText: '',
+      // cExamGradeText: '',
       cBirthplaceText: '',
       cExamTypeText: '',
       cNationNoText: '',
@@ -272,7 +276,7 @@ export default {
       cSexColumns: this.getDict('sys_user_sex'),
       cNationNoColumns: this.getDict('sign_nation'),
       cOccupationColumns: this.getDict('exam_type'),
-      cExamGradeColumns: this.getDict('sign_grade'),
+      // cExamGradeColumns: this.getDict('sign_grade'),
       areaList: {
         province_list: {},
         city_list: {},
@@ -286,6 +290,7 @@ export default {
     document.title = '立即报名'
     this.getAreaList('0')
     this.detail = this.$route.params
+    this.inSchStudent = this.detail.inSchStudent
     this.ninSchoolStudentPrice = numberFormat(this.detail.ninSchoolStudentPrice)
     this.nnotInSchoolStudentPrice = numberFormat(this.detail.nnotInSchoolStudentPrice)
     this.ninSchoolWorkersPrice = numberFormat(this.detail.ninSchoolWorkersPrice)
@@ -330,9 +335,20 @@ export default {
     },
     // 身份证查询信息
     idCardSearch () {
+      Toast.loading({
+        mask: true,
+        duration: 0,
+        message: '加载中...'
+      })
       axios.post(`${api.querySignUpByCardId}?cIdCard=${this.cIdCard}&nExamId=${this.nExamId}`)
         .then((data) => {
           if (data.data.code === 0) {
+            Toast.loading({
+              mask: true,
+              duration: 3000,
+              message: '加载中...'
+            })
+            this.overlayShow = false
             Dialog.confirm({
               title: '提示',
               message: '您已有该考试计划的报名信息，是否重新填写？'
@@ -342,8 +358,8 @@ export default {
               this.cSex = data.data.data.csex
               this.cWorkUnit = data.data.data.cworkUnit
               this.cBranchName = data.data.data.cbranchName
-              this.cBirthplace = data.data.data.cAddress
-              this.cDwellingplace = data.data.data.cdwellingplace
+              this.cBirthplace = `${data.data.data.cbirthProvince} ${data.data.data.cbirthCity} ${data.data.data.cbirthArea}`
+              this.cDwellingplace = `${data.data.data.cnowProvince} ${data.data.data.cnowCity} ${data.data.data.cnowArea}`
               this.nZipCode = data.data.data.nzipCode
               this.cStudentNo = data.data.data.cstudentNo
               this.cName = data.data.data.cname
@@ -352,10 +368,11 @@ export default {
               this.cNationNoText = this.pickerCNationNoValue(data.data.data.cnationNo)[0].text
               this.cNationNo = data.data.data.cnationNo
               this.cOccupation = data.data.data.coccupation
-              this.cOccupationText = this.pickerCExamTypeValue(data.data.data.coccupation)[0].text
+              this.cOccupationText = data.data.data.coccupation
+              // this.cOccupationText = this.pickerCExamTypeValue(data.data.data.coccupation)[0].text
               this.cSchoolName = data.data.data.cschoolName
-              this.cExamGrade = data.data.data.cexamGrade
-              this.file = data.data.data.cidCardImg
+              // this.cExamGrade = data.data.data.cexamGrade
+              this.cIdCardImg = data.data.data.cidCardImg
               this.cExamType = data.data.data.cexamType
               this.cExamTypeText = this.pickerCExamTypeValue(data.data.data.cexamType)[0].text
               this.cBirthArea = data.data.data.cbirthArea
@@ -364,6 +381,12 @@ export default {
               this.cBirthplaceText = this.pickerPlaceValue(data.data.data.cbirthArea, data.data.data.cbirthCity, data.data.data.cbirthProvince)
               this.cDwellingplaceText = this.pickerPlaceValue(data.data.data.cnowArea, data.data.data.cnowCity, data.data.data.cnowProvince)
             }).catch(() => {
+            })
+          } else {
+            Toast.loading({
+              mask: true,
+              duration: 2000,
+              message: '未查询到信息'
             })
           }
         })
@@ -404,11 +427,24 @@ export default {
             })
             switch (type) {
               case 'exam_type':
+                // 学生端和老师端选择的内容不同
                 this.cExamTypeColumns = arrayList.filter(item => {
-                  return item.value !== '3'
+                  // 学生端
+                  if (this.inSchStudent === 'ture') {
+                    return item.value === 1
+                  } else if (this.inSchStudent === 'ture') {
+                    return item.value === 2
+                  }
+                  // return item.value === '4' // 老师端
                 })
                 this.cOccupationColumns = arrayList.filter(item => {
-                  return item.value !== '3'
+                  // 学生端
+                  if (this.inSchStudent === 'ture') {
+                    return item.value === 1
+                  } else if (this.inSchStudent === 'ture') {
+                    return item.value === 2
+                  }
+                  // return item.value === '4' // 老师端
                 })
                 break
               case 'sys_user_sex':
@@ -417,9 +453,9 @@ export default {
               case 'sign_nation':
                 this.cNationNoColumns = arrayList
                 break
-              case 'sign_grade':
-                this.cExamGradeColumns = arrayList
-                break
+              // case 'sign_grade':
+              //   this.cExamGradeColumns = arrayList
+              //   break
               default :
                 return ''
             }
@@ -445,9 +481,9 @@ export default {
         case 'cOccupation':
           this.pickColumns = this.cOccupationColumns
           break
-        case 'cExamGrade':
-          this.pickColumns = this.cExamGradeColumns
-          break
+        // case 'cExamGrade':
+        //   this.pickColumns = this.cExamGradeColumns
+        //   break
         default :
           this.pickColumns = []
       }
@@ -462,9 +498,10 @@ export default {
       this.pickerArea = false
       let areaName = ''
       let areaCode = ''
-      for (var i = 0; i < picker.length; i++) {
-        areaName = areaName + picker[i].name + ' '
-        areaCode = areaCode + picker[i].code + ' '
+      let pickerData = picker.filter(item => item !== undefined)
+      for (var i = 0; i < pickerData.length; i++) {
+        areaName = areaName + pickerData[i].name + ' '
+        areaCode = areaCode + pickerData[i].code + ' '
       }
       switch (this.pickerAreaType) {
         case 'cBirthplace':
@@ -498,12 +535,13 @@ export default {
           break
         case 'cOccupation':
           this.cOccupationText = picker.text
-          this.cOccupation = picker.value
+          // this.cOccupation = picker.value
+          this.cOccupation = picker.text
           break
-        case 'cExamGrade':
-          this.cExamGradeText = picker.text
-          this.cExamGrade = picker.value
-          break
+        // case 'cExamGrade':
+        //   this.cExamGradeText = picker.text
+        //   this.cExamGrade = picker.value
+        //   break
         default :
           return ''
       }
@@ -547,8 +585,11 @@ export default {
       } else if (!this.cBranchName) {
         this.$toast('部门名称不能为空')
         return false
-      } else if (!this.cDwellingplace) {
+      } else if (!this.cDwellingplaceText) {
         this.$toast('现居住地不能为空')
+        return false
+      } else if (!this.cBirthplaceText) {
+        this.$toast('出生地区不能为空')
         return false
       } else if (!this.cName) {
         this.$toast('工作单位不能为空')
@@ -589,8 +630,7 @@ export default {
     // 上传图片
     onRead (file) {
       // 将原图片显示为选择的图片
-      // this.$refs.goodsImg.src = file.content
-      this.file = file.content
+      this.cIdCardImg = file.content
       let formData = new FormData()
       formData.append('avatar', this.dataURLtoBlob(file.content))
       axios.post(`${api.upload}`,
@@ -636,7 +676,7 @@ export default {
         cNationNo: this.cNationNo,
         cOccupation: this.cOccupation,
         cSchoolName: this.cSchoolName,
-        cExamGrade: this.cExamGrade,
+        // cExamGrade: this.cExamGrade,
         cIdCardImg: this.cIdCardImg,
         nExamId: this.detail.nexamId
       }))
@@ -658,5 +698,11 @@ export default {
   }
 }
 </script>
+<style>
+  .van-field__control:disabled {
+    color: #2a2a2a !important;
+    -webkit-text-fill-color: #2a2a2a !important;
+  }
+</style>
 <style lang="scss" scoped src="./index.scss">
 </style>

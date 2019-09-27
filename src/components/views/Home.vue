@@ -29,8 +29,9 @@
 <script>
 import Vue from 'vue'
 import { Button, Row, Col, Image, Dialog } from 'vant'
-import { axiosGet } from '../../comment/http'
+import { axiosGet, axiosPost } from '../../comment/http'
 import api from '../../comment/api'
+import qs from 'qs'
 Vue.use(Button).use(Row).use(Col).use(Image).use(Dialog)
 export default {
   name: 'home',
@@ -41,14 +42,33 @@ export default {
       ninSchoolStudentPrice: '',
       ninSchoolWorkersPrice: '',
       nnotInSchoolStudentPrice: '',
-      nexamId: ''
+      nexamId: '',
+      userid: this.$route.query.userid,
+      function_id: this.$route.query.function_id,
+      authTime: this.$route.query.authTime,
+      ticket: this.$route.query.ticket,
+      inSchStudent: '' // 是否是在校生
     }
   },
   mounted () {
     document.title = '报名考试系统'
-    this.getcheckExam()
+    this.getcheckExam() // 是否可以报考
+    this.isStudent() // 学生进入是什么身份
   },
   methods: {
+    isStudent () {
+      axiosPost(`${api.login}`, qs.stringify({
+        userid: this.userid,
+        functionId: this.function_id,
+        authTime: this.authTime,
+        ticket: this.ticket
+      }))
+        .then((data) => {
+          if (data.code === 0) {
+            this.inSchStudent = data.data.inSchStudent
+          }
+        })
+    },
     getcheckExam () {
       axiosGet(`${api.checkExamDetail}`)
         .then((data) => {
@@ -85,7 +105,8 @@ export default {
         ninSchoolStudentPrice: this.ninSchoolStudentPrice,
         ninSchoolWorkersPrice: this.ninSchoolWorkersPrice,
         nnotInSchoolStudentPrice: this.nnotInSchoolStudentPrice,
-        nexamId: this.nexamId
+        nexamId: this.nexamId,
+        inSchStudent: this.inSchStudent
       }
       if (window.sessionStorage.getItem('hasExaminationPlan') !== 'false') {
         this.$router.push({name: 'Examination', params: data})
