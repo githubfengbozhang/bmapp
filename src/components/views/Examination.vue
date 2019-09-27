@@ -306,7 +306,7 @@ export default {
         }
       })
       console.log(newData)
-      return newData
+      return newData.length > 0 ? newData : [ {text: '', value: ''} ]
     },
     pickerCSexValue (value) {
       let newData = this.cSexColumns.filter((item) => {
@@ -379,6 +379,9 @@ export default {
               this.cBirthCity = data.data.data.cbirthCity
               this.cBirthProvince = data.data.data.cbirthProvince
               this.cBirthplaceText = this.pickerPlaceValue(data.data.data.cbirthArea, data.data.data.cbirthCity, data.data.data.cbirthProvince)
+              this.cNowArea = data.data.data.cnowArea
+              this.cNowCity = data.data.data.cnowCity
+              this.cNowProvince = data.data.data.cnowProvince
               this.cDwellingplaceText = this.pickerPlaceValue(data.data.data.cnowArea, data.data.data.cnowCity, data.data.data.cnowProvince)
             }).catch(() => {
             })
