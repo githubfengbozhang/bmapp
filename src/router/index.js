@@ -8,6 +8,7 @@ import Result from '@/components/views/Result'
 import Notice from '@/components/views/Notice'
 import NoticeDetail from '@/components/views/NoticeDetail'
 import Pay from '@/components/views/Pay'
+import ToPay from '@/components/views/ToPay'
 Vue.use(Router)
 
 export default new Router({
@@ -51,6 +52,11 @@ export default new Router({
       path: '/pay',
       name: 'Pay',
       component: Pay
+    },
+    {
+      path: '/toPay',
+      name: 'ToPay',
+      component: ToPay
     }
   ]
 })

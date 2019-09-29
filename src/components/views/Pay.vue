@@ -44,7 +44,8 @@ export default {
           if (data.data.code !== 0) {
             this.$toast(data.data.msg)
           } else {
-            window.location.href = data.data.data.cpayUrl
+            // window.location.href = data.data.data.cpayUrl
+            this.$router.push({name: 'ToPay'})
           }
         })
     }
