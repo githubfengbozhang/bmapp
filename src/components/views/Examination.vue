@@ -8,7 +8,7 @@
             round
             width="3rem"
             height="3rem"
-            :src="cIdCardImg"
+            :src="file"
           />
           <van-icon
             slot="right-icon"
@@ -25,19 +25,16 @@
         v-model="cIdCard"
         label="身份证号"
         placeholder="请输入考生身份证号码"
-        clearable
         required
-        disabled
-        @touchstart.native.stop="numberShow = true"
       />
-      <van-number-keyboard
+      <!-- <van-number-keyboard
         v-model="cIdCard"
         :show="numberShow"
         extra-key="x"
         :maxlength="18"
         :safe-area-inset-bottom = "true"
         @blur="numberShow = false"
-      />
+      /> -->
       <van-field
         readonly
         clickable
@@ -218,6 +215,8 @@ Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(P
 export default {
   data () {
     return {
+      // 图片显示
+      file: require('../../assets/touxiang.png'),
       overlayShow: false,
       // 键盘显示
       numberShow: false,
@@ -258,7 +257,7 @@ export default {
       cSchoolName: '',
       // cExamGrade: '',
       // 图片
-      cIdCardImg: require('../../assets/touxiang.png'),
+      cIdCardImg: '',
       cExamType: '',
       // 下拉显示的值
       cSexText: '',
@@ -373,6 +372,7 @@ export default {
               this.cSchoolName = data.data.data.cschoolName
               // this.cExamGrade = data.data.data.cexamGrade
               this.cIdCardImg = data.data.data.cidCardImg
+              this.file = data.data.data.cidCardImg
               this.cExamType = data.data.data.cexamType
               this.cExamTypeText = this.pickerCExamTypeValue(data.data.data.cexamType)[0].text
               this.cBirthArea = data.data.data.cbirthArea
@@ -421,7 +421,7 @@ export default {
     },
     // 枚举下拉
     getDict (type) {
-      // let that = this
+      let that = this
       return axiosGet(`${api.getDict}?dictType=${type}`)
         .then((data) => {
           if (data.code === 0) {
@@ -439,16 +439,22 @@ export default {
                   //   this.showPrice(item.value)
                   //   this.cExamTypeText = item.text
                   //   this.cExamType = item.value
+                  //   this.cOccupationText = item.text
+                  //   this.cOccupation = item.value
                   //   return true
                   // } else if (that.inSchStudent === 'false' && item.value === '2') {
                   //   this.showPrice(item.value)
                   //   this.cExamTypeText = item.text
                   //   this.cExamType = item.value
+                  //   this.cOccupationText = item.text
+                  //   this.cOccupation = item.value
                   //   return true
                   // }
                   this.showPrice(item.value)
                   this.cOccupationText = item.text
                   this.cOccupation = item.value
+                  this.cExamTypeText = item.text
+                  this.cExamType = item.value
                   return item.value === '4' // 老师端
                 })
                 this.cOccupationColumns = arrayList.filter(item => {
@@ -653,7 +659,7 @@ export default {
     // 上传图片
     onRead (file) {
       // 将原图片显示为选择的图片
-      this.cIdCardImg = file.content
+      this.file = file.content
       let formData = new FormData()
       formData.append('avatar', this.dataURLtoBlob(file.content))
       axios.post(`${api.upload}`,
