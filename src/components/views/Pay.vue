@@ -1,3 +1,9 @@
+<!--
+ * @Author: fengbozhang
+ * @Date: 2019-10-09 10:37:31
+ * @LastEditors: fengbozhang
+ * @LastEditTime: 2019-10-09 16:48:09
+ -->
 <template>
   <div>
     <div></div>
@@ -29,7 +35,8 @@ export default {
   data () {
     return {
       payData: {},
-      nPayAmt: ''
+      nPayAmt: '',
+      loadingShow: false
     }
   },
   mounted () {
@@ -38,14 +45,21 @@ export default {
   },
   methods: {
     pay () {
+      this.loadingShow = true
       axios.post(api.createOrder, qs.stringify(this.payData))
         .then((data) => {
-          console.log(data.data.data.cpayUrl)
           if (data.data.code !== 0) {
+            this.loadingShow = false
             this.$toast(data.data.msg)
           } else {
             // window.location.href = data.data.data.cpayUrl
-            this.$router.push({name: 'ToPay'})
+            this.loadingShow = false
+            let paramsObj = {
+              action: data.data.data.params.action,
+              json: data.data.data.params.json,
+              signature: data.data.data.params.signature
+            }
+            this.$router.push({name: 'ToPay', params: paramsObj})
           }
         })
     }

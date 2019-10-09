@@ -1,3 +1,9 @@
+<!--
+ * @Author: fengbozhang
+ * @Date: 2019-10-09 10:37:31
+ * @LastEditors: fengbozhang
+ * @LastEditTime: 2019-10-09 10:37:31
+ -->
 <template>
   <div class='secondpage'>
     <van-cell-group>
@@ -421,7 +427,7 @@ export default {
     },
     // 枚举下拉
     getDict (type) {
-      let that = this
+      // let that = this
       return axiosGet(`${api.getDict}?dictType=${type}`)
         .then((data) => {
           if (data.code === 0) {
