@@ -427,7 +427,7 @@ export default {
     },
     // 枚举下拉
     getDict (type) {
-      // let that = this
+      let that = this
       return axiosGet(`${api.getDict}?dictType=${type}`)
         .then((data) => {
           if (data.code === 0) {
@@ -441,45 +441,45 @@ export default {
                 this.cExamTypeColumns = arrayList.filter(item => {
                   console.log(this.inSchStudent)
                   // 学生端
-                  // if (that.inSchStudent === 'true' && item.value === '1') {
-                  //   this.showPrice(item.value)
-                  //   this.cExamTypeText = item.text
-                  //   this.cExamType = item.value
-                  //   this.cOccupationText = item.text
-                  //   this.cOccupation = item.value
-                  //   return true
-                  // } else if (that.inSchStudent === 'false' && item.value === '2') {
-                  //   this.showPrice(item.value)
-                  //   this.cExamTypeText = item.text
-                  //   this.cExamType = item.value
-                  //   this.cOccupationText = item.text
-                  //   this.cOccupation = item.value
-                  //   return true
-                  // }
-                  this.showPrice(item.value)
-                  this.cOccupationText = item.text
-                  this.cOccupation = item.value
-                  this.cExamTypeText = item.text
-                  this.cExamType = item.value
-                  return item.value === '4' // 老师端
+                  if (that.inSchStudent === 'true' && item.value === '1') {
+                    this.showPrice(item.value)
+                    this.cExamTypeText = item.text
+                    this.cExamType = item.value
+                    this.cOccupationText = item.text
+                    this.cOccupation = item.value
+                    return true
+                  } else if (that.inSchStudent === 'false' && item.value === '2') {
+                    this.showPrice(item.value)
+                    this.cExamTypeText = item.text
+                    this.cExamType = item.value
+                    this.cOccupationText = item.text
+                    this.cOccupation = item.value
+                    return true
+                  }
+                  // this.showPrice(item.value)
+                  // this.cOccupationText = item.text
+                  // this.cOccupation = item.value
+                  // this.cExamTypeText = item.text
+                  // this.cExamType = item.value
+                  // return item.value === '4' // 老师端
                 })
                 this.cOccupationColumns = arrayList.filter(item => {
                   // 学生端
-                  // if (that.inSchStudent === 'true' && item.value === '1') {
-                  //   this.showPrice(item.value)
-                  //   this.cOccupationText = item.text
-                  //   this.cOccupation = item.value
-                  //   return true
-                  // } else if (that.inSchStudent === 'false' && item.value === '2') {
-                  //   this.showPrice(item.value)
-                  //   this.cOccupationText = item.text
-                  //   this.cOccupation = item.value
-                  //   return true
-                  // }
-                  this.showPrice(item.value)
-                  this.cOccupationText = item.text
-                  this.cOccupation = item.value
-                  return item.value === '4' // 老师端
+                  if (that.inSchStudent === 'true' && item.value === '1') {
+                    this.showPrice(item.value)
+                    this.cOccupationText = item.text
+                    this.cOccupation = item.value
+                    return true
+                  } else if (that.inSchStudent === 'false' && item.value === '2') {
+                    this.showPrice(item.value)
+                    this.cOccupationText = item.text
+                    this.cOccupation = item.value
+                    return true
+                  }
+                  // this.showPrice(item.value)
+                  // this.cOccupationText = item.text
+                  // this.cOccupation = item.value
+                  // return item.value === '4' // 老师端
                 })
                 break
               case 'sys_user_sex':
