@@ -2,11 +2,11 @@
  * @Author: fengbozhang
  * @Date: 2019-10-09 10:37:31
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-09 10:37:31
+ * @LastEditTime: 2019-10-10 10:30:59
  */
 // const server = 'http://121.196.200.183:8080/school'
-// const server = 'http://183.230.255.84:9292/pth'
-const server = 'http://g2mdw2.natappfree.cc/pth'
+const server = 'http://183.230.255.84:9292/pth'
+// const server = 'http://g2mdw2.natappfree.cc/pth'
 const api = {
   signUpSave: `${server}/api/school/sign/save`, // 新增报名信息
   querySignUp: `${server}/api/school/sign/querySignUp`, // 报名信息查询
