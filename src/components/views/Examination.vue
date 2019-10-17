@@ -2,12 +2,29 @@
  * @Author: fengbozhang
  * @Date: 2019-10-09 10:37:31
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-09 10:37:31
+ * @LastEditTime: 2019-10-17 16:41:25
  -->
 <template>
   <div class='secondpage'>
+    <simple-cropper :initParam="uploadParam" :successCallback="uploadHandle" ref="cropper">
+    <van-cell title="头像" right-icon="arrow" value="内容" >
+      <van-image
+        slot="default"
+        width="2.25rem"
+        height="3rem"
+        :src="file"
+        @click="upload"
+      />
+      <van-icon
+        slot="right-icon"
+        name="arrow"
+        style="line-height: inherit;"
+      />
+    </van-cell>
+    <!-- <img :src="file" @click="upload"> -->
+  </simple-cropper>
     <van-cell-group>
-      <van-uploader :after-read="onRead" :accept="'image/*'" :max-count="1">
+      <!-- <van-uploader :after-read="onRead" :accept="'image/*'" :max-count="1">
         <van-cell title="头像" right-icon="arrow" value="内容" >
           <van-image
             slot="default"
@@ -22,7 +39,7 @@
             style="line-height: inherit;"
           />
         </van-cell>
-      </van-uploader>
+      </van-uploader> -->
     </van-cell-group>
     <van-cell-group>
       <van-icon name="search" class="idCardIcon" @click="idCardSearch()"/>
@@ -79,6 +96,7 @@
         label="考生电话"
         placeholder="请输入考生联系电话"
         clearable
+        type='tel'
         required
       />
       <van-field
@@ -104,6 +122,7 @@
         label="学号"
         placeholder="请输入学生证学号"
         clearable
+        :readonly='isReadonly'
       />
     </van-cell-group>
     <van-cell-group>
@@ -138,14 +157,20 @@
         v-model="cAddress"
         label="地址"
         placeholder="请输入地址"
+        type='textarea'
+        maxlength='30'
         clearable
+        :autosize='true'
         required
       />
       <van-field
         v-model="cWorkUnit"
         label="工作单位"
-        placeholder="请输入工作单位"
+        placeholder="请输入工作单位(身份证上地址要求不超30个字)"
         clearable
+        maxlength='30'
+        :autosize='true'
+        type='textarea'
         required
       />
       <van-field
@@ -177,6 +202,21 @@
       />
     </van-cell-group>
     <van-cell-group>
+      <van-field
+      v-model="cexamTitle"
+      label="考试计划"
+      disabled
+      />
+      <van-field
+      v-model="texamBeginTime"
+      label="开始时间"
+      disabled
+      />
+      <van-field
+      v-model="texamEndTime"
+      label="结束时间"
+      disabled
+      />
       <van-field
       v-model="cexamAddress"
       label="考试场地"
@@ -211,6 +251,13 @@
 </template>
 <script>
 import Vue from 'vue'
+import SimpleCropper from '../views/cropper'
+import moment from 'moment'
+import setSession, { sessionStorage } from '../../comment/sessionStorage'
+// import Cropper from 'cropperjs'
+// import 'cropperjs/dist/cropper.min.css'
+// // import VueCropper from 'vue-cropper'
+// import lrz from 'lrz'
 import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader, Dialog, NumberKeyboard } from 'vant'
 import { axiosGet } from '../../comment/http'
 import numberFormat from '@uilt/momey'
@@ -221,6 +268,10 @@ Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(P
 export default {
   data () {
     return {
+      uploadParam: {
+        uploadURL: `${api.upload}`, // 上传地址
+        scale: 1 // 相对手机屏幕放大的倍数: 4倍
+      },
       // 图片显示
       file: require('../../assets/touxiang.png'),
       overlayShow: false,
@@ -238,6 +289,12 @@ export default {
       nnotInSchoolStudentPrice: '',
       ninSchoolWorkersPrice: '',
       cexamAddress: '',
+      cexamTitle: '',
+      texamBeginTime: '',
+      cStudentNo: '',
+      texamEndTime: '',
+      // 学号是否可编辑（老师端可以编辑true，学生端不可以编辑false）
+      isReadonly: false,
       // 学生端是否是在校生
       inSchStudent: '',
       // 单项选择器弹窗是否显示
@@ -254,7 +311,6 @@ export default {
       cBirthplace: '',
       cDwellingplace: '',
       nZipCode: '',
-      cStudentNo: '',
       cName: '',
       cIdCard: '',
       cPhone: '',
@@ -294,15 +350,37 @@ export default {
   mounted () {
     document.title = '立即报名'
     this.getAreaList('0')
-    this.detail = this.$route.params
-    this.inSchStudent = this.detail.inSchStudent
-    this.ninSchoolStudentPrice = numberFormat(this.detail.ninSchoolStudentPrice)
-    this.nnotInSchoolStudentPrice = numberFormat(this.detail.nnotInSchoolStudentPrice)
-    this.ninSchoolWorkersPrice = numberFormat(this.detail.ninSchoolWorkersPrice)
-    this.cexamAddress = this.detail.cexamAddress
-    this.nExamId = this.detail.nexamId
+    // this.detail = this.$route.params
+    this.inSchStudent = sessionStorage.getItem('inSchStudent')
+    // this.inSchStudent = 'true' // 测试用的数据
+    this.ninSchoolStudentPrice = numberFormat(sessionStorage.getItem('ninSchoolStudentPrice'))
+    this.nnotInSchoolStudentPrice = numberFormat(sessionStorage.getItem('nnotInSchoolStudentPrice'))
+    this.ninSchoolWorkersPrice = numberFormat(sessionStorage.getItem('ninSchoolWorkersPrice'))
+    this.cexamAddress = sessionStorage.getItem('cexamAddress')
+    this.cexamTitle = sessionStorage.getItem('cexamTitle')
+    this.texamBeginTime = moment(sessionStorage.getItem('texamBeginTime')).format('YYYY-MM-DD')
+    this.texamEndTime = moment(sessionStorage.getItem('texamEndTime')).format('YYYY-MM-DD')
+    this.nExamId = sessionStorage.getItem('nexamId')
+    this.cStudentNo = sessionStorage.getItem('cStudentNo')
+    // this.cropperInit() // 裁剪初始化
   },
   methods: {
+    // 上传头像
+    upload () {
+      Dialog.confirm({
+        title: '提示',
+        message: `请上传<span style='color:red'>390*567</span>像素的免冠证件照，以免报考失败！`
+      })
+        .then(() => this.$refs['cropper'].upload())
+        .catch(() => {})
+    },
+    // 上传头像成功回调
+    uploadHandle (data, img) {
+      if (data.code === 0) {
+        this.cIdCardImg = data.fileName
+        this.file = img
+      }
+    },
     // 下拉默认值渲染cExamType
     pickerCExamTypeValue (value) {
       let newData = this.cExamTypeColumns.filter((item) => {
@@ -333,9 +411,9 @@ export default {
     },
     pickerPlaceValue (area, city, province) {
       console.log(this.areaList)
-      let provinceList = this.areaList.province_list[province]
-      let cityList = this.areaList.city_list[city]
-      let countyList = this.areaList.county_list[area]
+      let provinceList = this.areaList.province_list[province] || ''
+      let cityList = this.areaList.city_list[city] || ''
+      let countyList = this.areaList.county_list[area] || ''
       return provinceList + cityList + countyList
     },
     // 身份证查询信息
@@ -373,8 +451,7 @@ export default {
               this.cNationNoText = this.pickerCNationNoValue(data.data.data.cnationNo)[0].text
               this.cNationNo = data.data.data.cnationNo
               this.cOccupation = data.data.data.coccupation
-              this.cOccupationText = data.data.data.coccupation
-              // this.cOccupationText = this.pickerCExamTypeValue(data.data.data.coccupation)[0].text
+              this.cOccupationText = data.data.data.coccupation // 职业返回的是文字
               this.cSchoolName = data.data.data.cschoolName
               // this.cExamGrade = data.data.data.cexamGrade
               this.cIdCardImg = data.data.data.cidCardImg
@@ -437,26 +514,25 @@ export default {
             })
             switch (type) {
               case 'exam_type':
-                // 学生端和老师端选择的内容不同
+                // 学生端(在校生和非在校生)和老师端选择的内容不同
                 this.cExamTypeColumns = arrayList.filter(item => {
-                  console.log(this.inSchStudent)
                   // 学生端
                   if (that.inSchStudent === 'true' && item.value === '1') {
-                    this.showPrice(item.value)
+                    this.showPrice('1')
                     this.cExamTypeText = item.text
                     this.cExamType = item.value
                     this.cOccupationText = item.text
                     this.cOccupation = item.value
                     return true
                   } else if (that.inSchStudent === 'false' && item.value === '2') {
-                    this.showPrice(item.value)
+                    this.showPrice('1')
                     this.cExamTypeText = item.text
                     this.cExamType = item.value
                     this.cOccupationText = item.text
                     this.cOccupation = item.value
                     return true
                   }
-                  // this.showPrice(item.value)
+                  // this.showPrice('4')
                   // this.cOccupationText = item.text
                   // this.cOccupation = item.value
                   // this.cExamTypeText = item.text
@@ -466,19 +542,10 @@ export default {
                 this.cOccupationColumns = arrayList.filter(item => {
                   // 学生端
                   if (that.inSchStudent === 'true' && item.value === '1') {
-                    this.showPrice(item.value)
-                    this.cOccupationText = item.text
-                    this.cOccupation = item.value
                     return true
                   } else if (that.inSchStudent === 'false' && item.value === '2') {
-                    this.showPrice(item.value)
-                    this.cOccupationText = item.text
-                    this.cOccupation = item.value
                     return true
                   }
-                  // this.showPrice(item.value)
-                  // this.cOccupationText = item.text
-                  // this.cOccupation = item.value
                   // return item.value === '4' // 老师端
                 })
                 break
@@ -587,16 +654,19 @@ export default {
           this.ninSchoolStudentPriceShow = true
           this.nnotInSchoolStudentPriceShow = false
           this.ninSchoolWorkersPriceShow = false
+          this.isReadonly = true
           break
         case '2':
           this.ninSchoolStudentPriceShow = false
           this.nnotInSchoolStudentPriceShow = true
           this.ninSchoolWorkersPriceShow = false
+          this.isReadonly = true
           break
         case '4':
           this.ninSchoolStudentPriceShow = false
           this.nnotInSchoolStudentPriceShow = false
           this.ninSchoolWorkersPriceShow = true
+          this.isReadonly = false
           break
         default:
           break
@@ -648,45 +718,30 @@ export default {
         return true
       }
     },
-    // base64转为二进制流
-    dataURLtoBlob (baseurl) {
-      let arr = baseurl.split(',')
-      let mime = arr[0].match(/:(.*?);/)[1]
-      let bstr = atob(arr[1])
-      let n = bstr.length
-      let u8arr = new Uint8Array(n)
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n)
-      }
-      return new Blob([u8arr], {
-        type: mime
-      })
-    },
     // 上传图片
-    onRead (file) {
-      // 将原图片显示为选择的图片
-      this.file = file.content
-      let formData = new FormData()
-      formData.append('avatar', this.dataURLtoBlob(file.content))
-      axios.post(`${api.upload}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      )
-        .then((data) => {
-          if (data.data.code === 0) {
-            this.cIdCardImg = data.data.fileName
-          } else if (data.data.code !== 0) {
-            Toast.fail({mask: true}, data.data.msg)
-          }
-        })
-    },
+    // onRead (file) {
+    //   // 将原图片显示为选择的图片
+    //   this.file = file.content
+    //   let formData = new FormData()
+    //   formData.append('avatar', this.dataURLtoBlob(file.content))
+    //   axios.post(`${api.upload}`,
+    //     formData,
+    //     {
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data'
+    //       }
+    //     }
+    //   )
+    //     .then((data) => {
+    //       if (data.data.code === 0) {
+    //         this.cIdCardImg = data.data.fileName
+    //       } else if (data.data.code !== 0) {
+    //         Toast.fail({mask: true}, data.data.msg)
+    //       }
+    //     })
+    // },
     // 提交
     save () {
-      console.log(this.detail.nexamId)
       if (!this.verification()) {
         return
       }
@@ -709,11 +764,11 @@ export default {
         cIdCard: this.cIdCard,
         cPhone: this.cPhone,
         cNationNo: this.cNationNo,
-        cOccupation: this.cOccupation,
+        cOccupation: this.cOccupationText,
         cSchoolName: this.cSchoolName,
         // cExamGrade: this.cExamGrade,
         cIdCardImg: this.cIdCardImg,
-        nExamId: this.detail.nexamId
+        nExamId: this.nExamId
       }))
         .then((data) => {
           this.loadingShow = false
@@ -723,13 +778,21 @@ export default {
             const payData = {
               cDataSrc: 'APP',
               cTradeNo: data.data.data.ctradeNo,
-              nExamId: this.detail.nexamId,
+              nExamId: this.nExamId,
               nPayAmt: data.data.data.npayAmt
             }
-            this.$router.push({ name: 'Pay', params: payData })
+            if (data.data.data.ctradeDes === '已缴费') {
+              Toast('您已完成缴费，请您及时参加考试！')
+            } else {
+              setSession(payData)
+              this.$router.push({ name: 'Pay' })
+            }
           }
         })
     }
+  },
+  components: {
+    SimpleCropper
   }
 }
 </script>

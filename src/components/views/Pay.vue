@@ -2,7 +2,7 @@
  * @Author: fengbozhang
  * @Date: 2019-10-09 10:37:31
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-09 16:48:09
+ * @LastEditTime: 2019-10-17 15:53:34
  -->
 <template>
   <div>
@@ -27,6 +27,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import api from '../../comment/api'
 import numberFormat from '../../uilt/momey'
+import { sessionStorage } from '../../comment/sessionStorage'
 import qs from 'qs'
 import { Cell, CellGroup, Button, Popup, Area, Icon, Toast } from 'vant'
 Vue.use(Cell).use(CellGroup).use(Button).use(Popup).use(Area).use(Toast).use(Icon).use(Toast)
@@ -34,14 +35,18 @@ export default {
   name: 'result',
   data () {
     return {
-      payData: {},
-      nPayAmt: '',
+      payData: {
+        cTradeNo: '',
+        nPayAmt: ''
+      },
       loadingShow: false
     }
   },
   mounted () {
-    this.payData = this.$route.params
-    this.nPayAmt = numberFormat(this.$route.params.nPayAmt)
+    this.payData = {
+      cTradeNo: sessionStorage.getItem('cTradeNo'),
+      nPayAmt: numberFormat(sessionStorage.getItem('nPayAmt'))
+    }
   },
   methods: {
     pay () {

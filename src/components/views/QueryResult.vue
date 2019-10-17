@@ -1,3 +1,9 @@
+<!--
+ * @Author: fengbozhang
+ * @Date: 2019-10-09 10:37:31
+ * @LastEditors: fengbozhang
+ * @LastEditTime: 2019-10-17 10:52:23
+ -->
 <template class='result'>
     <div>
       <van-cell-group>
@@ -11,13 +17,6 @@
           disabled
         />
         <van-field
-            v-model="cName"
-            required
-            clearable
-            label="考生姓名"
-            placeholder="请输入考生姓名"
-        />
-        <van-field
             v-model="cIdCard"
             label="身份证号"
             placeholder="请输入身份证号"
@@ -25,11 +24,17 @@
             required
         />
         <van-field
+            v-model="cName"
+            clearable
+            label="考生姓名"
+            placeholder="请输入考生姓名"
+        />
+        <van-field
             v-model="cPhone"
             label="考生电话"
             placeholder="请输入考生电话"
             clearable
-            required
+            type='tel'
         />
         <van-popup v-model="picker" position="bottom">
           <van-picker
@@ -97,15 +102,15 @@ export default {
       this.nExamId = picker.value
     },
     query () {
-      if (this.cName === '') {
-        this.$toast('考生姓名不能为空')
-        return false
-      }
+      // if (this.cName === '') {
+      //   this.$toast('考生姓名不能为空')
+      //   return false
+      // }
       if (this.cIdCard === '' || !(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(this.cIdCard))) {
         this.$toast('请输入正确的身份证号')
         return false
       }
-      if (this.cPhone === '' || !(/^1[3456789]\d{9}$/.test(this.cPhone))) {
+      if (this.cPhone && !(/^1[3456789]\d{9}$/.test(this.cPhone))) {
         this.$toast('请输入正确的手机号码')
         return false
       }
