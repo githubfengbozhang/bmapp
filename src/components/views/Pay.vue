@@ -2,7 +2,7 @@
  * @Author: fengbozhang
  * @Date: 2019-10-09 10:37:31
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-17 15:53:34
+ * @LastEditTime: 2019-10-18 10:13:16
  -->
 <template>
   <div>
@@ -50,8 +50,14 @@ export default {
   },
   methods: {
     pay () {
+      let orderData = {
+        cTradeNo: sessionStorage.getItem('cTradeNo'),
+        nPayAmt: sessionStorage.getItem('nPayAmt'),
+        nExamId: sessionStorage.getItem('nExamId'),
+        cDataSrc: 'APP'
+      }
       this.loadingShow = true
-      axios.post(api.createOrder, qs.stringify(this.payData))
+      axios.post(api.createOrder, qs.stringify(orderData))
         .then((data) => {
           if (data.data.code !== 0) {
             this.loadingShow = false

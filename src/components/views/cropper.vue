@@ -2,7 +2,7 @@
  * @Author: fengbozhang
  * @Date: 2019-10-15 12:54:12
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-17 14:34:51
+ * @LastEditTime: 2019-10-24 16:18:32
  -->
 <template>
   <div class="v-simple-cropper">
@@ -10,7 +10,7 @@
       <button @click="upload">上传图片</button>
     </slot>
     <input class="file" ref="file" type="file" accept="image/*" @change="uploadChange">
-    <div class="v-cropper-layer" ref="layer">
+    <div class="v-cropper-layer" ref="layer" id='layer'>
       <div class="layer-header">
         <!-- <button class="cancel" @click="cancelHandle">取消</button>
         <button class="confirm" @click="confirmHandle">裁剪</button> -->
@@ -19,7 +19,7 @@
           <van-col span="6"><van-button :loading='loading' type="primary" loading-text="裁剪中..." @click="confirmHandle">裁剪</van-button></van-col>
         </van-row>
       </div>
-      <img ref="cropperImg">
+      <img ref="cropperImg" :src='defalutsrc'>
     </div>
   </div>
 </template>
@@ -29,6 +29,7 @@ import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.min.css'
 import { Button, Row, Col } from 'vant'
 import axios from 'axios'
+import api from '@comment/api'
 import Vue from 'vue'
 Vue.use(Button).use(Row).use(Col)
 export default {
@@ -44,11 +45,15 @@ export default {
     return {
       cropper: {},
       filename: '',
-      loading: false
+      loading: false,
+      isAndroid: navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1,
+      isiOS: !!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+      defalutsrc: require('../../assets/touxiang.png')
     }
   },
   mounted () {
     this.init()
+    console.log(this.GlobalVariable.ANDROID_APP)
   },
   methods: {
     // base64转为二进制流
@@ -66,6 +71,28 @@ export default {
       // })
       return new File([u8arr], filename, { type: mime })
     },
+
+    getBase64Image (img) {
+      var canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      var ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, img.width, img.height)
+      var ext = img.src.substring(img.src.lastIndexOf('.') + 1).toLowerCase()
+      var dataURL = canvas.toDataURL('image/' + ext)
+      return dataURL
+    },
+    dataURLtoFile (dataurl, filename) {
+      let arr = dataurl.split(',')
+      let mime = arr[0].match(/:(.*?);/)[1]
+      let bstr = atob(arr[1])
+      let n = bstr.length
+      let u8arr = new Uint8Array(n)
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n)
+      }
+      return new File([u8arr], filename, {type: mime})
+    },
     // 初始化裁剪插件
     init () {
       let cropperImg = this.$refs['cropperImg']
@@ -79,9 +106,53 @@ export default {
         cropBoxResizable: false
       })
     },
+    barcodeCallback () {
+      console.log('返回摄像1')
+      window.jsBridge.bind('CLIENT_CHOOSE_IMAGE_RESULT', function (object) {
+        var json = JSON.stringify(object)
+        console.log(json + '返回摄像2')
+      })
+    },
+    barcodeOpen () {
+      console.log('调用摄像头')
+      var param = {
+        'show': 1,
+        'tools': [{'name': 'cx_image', 'info': {'camera': 3}},
+          {'name': 'cx_camera', 'info': {'camera': 3}}
+          // {'name': 'cx_video', 'info': {'camera': 3}}
+        ]
+      }
+      let jsBridge = (object) => {
+        console.log('本机')
+        let file = JSON.parse(object['files'])
+        this.filename = file[0]['name']
+        let URL = window.URL || window.webkitURL
+        this.$refs['layer'].style.display = 'block'
+        let dataURL = ''
+        console.log('本机img')
+        axios.get(`${api.imgtobase64}?imgurl=http://p.ananas.chaoxing.com/star3/origin/${file[0]['objectid']}.${file[0]['type']}`)
+          .then((data) => {
+            if (data.data.code === 0) {
+              dataURL = this.dataURLtoFile(data.data.msg, this.filename)
+              this.cropper.replace(URL.createObjectURL(dataURL))
+            }
+          })
+      }
+      window.jsBridge.postNotification('CLIENT_SELECT_OPTION_BAR', param)
+      try {
+        window.jsBridge.bind('CLIENT_CHOOSE_IMAGE_RESULT', function (object) {
+          // var json = JSON.stringify(object)
+          jsBridge(object)
+        })
+      } catch (e) {}
+    },
     // 点击上传按钮
     upload () {
-      this.$refs['file'].click()
+      if (this.isAndroid && this.GlobalVariable.ANDROID_APP === 'teacher') {
+        this.barcodeOpen()
+      } else if (this.isiOS || this.GlobalVariable.ANDROID_APP !== 'teacher') {
+        this.$refs['file'].click()
+      }
     },
     // 选择上传文件
     uploadChange (e) {

@@ -2,7 +2,7 @@
  * @Author: fengbozhang
  * @Date: 2019-10-09 10:37:31
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-17 16:41:25
+ * @LastEditTime: 2019-10-31 15:11:53
  -->
 <template>
   <div class='secondpage'>
@@ -165,25 +165,26 @@
       />
       <van-field
         v-model="cWorkUnit"
-        label="工作单位"
-        placeholder="请输入工作单位(身份证上地址要求不超30个字)"
+        :label="this.GlobalVariable.ANDROID_APP === 'teacher' ? '工作单位' : '学校名称'"
+        :placeholder="this.GlobalVariable.ANDROID_APP === 'teacher' ? '请输入工作单位(身份证上地址要求不超30个字)' : '请输入学校名称'"
         clearable
         maxlength='30'
         :autosize='true'
         type='textarea'
+        :readonly='isReadonly'
         required
       />
       <van-field
         v-model="cBranchName "
-        label="部门"
-        placeholder="请输入部门"
+        :label="this.GlobalVariable.ANDROID_APP === 'teacher' ? '部门' : '所属院系'"
+        :placeholder="this.GlobalVariable.ANDROID_APP === 'teacher' ? '请输入部门' : '请输入所属院系'"
         clearable
         required
       />
-      <van-field
-        v-model="cSchoolName"
-        label="所在院系"
-        placeholder="请输入所在院系"
+      <van-field  v-if="this.GlobalVariable.ANDROID_APP === 'teacher'"
+        v-model="cSchoolName "
+        label="所属院系"
+        placeholder="请输所属院系"
         clearable
       />
       <!-- <van-field
@@ -196,6 +197,7 @@
       /> -->
       <van-field
         v-model="nZipCode"
+        maxlength='6'
         label="邮编"
         placeholder="请输入邮编"
         clearable
@@ -209,12 +211,12 @@
       />
       <van-field
       v-model="texamBeginTime"
-      label="开始时间"
+      label="考试开始"
       disabled
       />
       <van-field
       v-model="texamEndTime"
-      label="结束时间"
+      label="考试结束"
       disabled
       />
       <van-field
@@ -253,16 +255,16 @@
 import Vue from 'vue'
 import SimpleCropper from '../views/cropper'
 import moment from 'moment'
-import setSession, { sessionStorage } from '../../comment/sessionStorage'
+import setSession, { sessionStorage } from '@comment/sessionStorage'
 // import Cropper from 'cropperjs'
 // import 'cropperjs/dist/cropper.min.css'
 // // import VueCropper from 'vue-cropper'
 // import lrz from 'lrz'
 import { Cell, CellGroup, Image, Field, Button, ActionSheet, Picker, Popup, Area, Toast, Icon, Uploader, Dialog, NumberKeyboard } from 'vant'
-import { axiosGet } from '../../comment/http'
+import { axiosGet } from '@comment/http'
 import numberFormat from '@uilt/momey'
 import axios from 'axios'
-import api from '../../comment/api'
+import api from '@comment/api'
 import qs from 'qs'
 Vue.use(Cell).use(CellGroup).use(Image).use(Field).use(Button).use(Picker).use(Popup).use(Area).use(Toast).use(Icon).use(Uploader).use(Dialog).use(NumberKeyboard).use(ActionSheet)
 export default {
@@ -290,11 +292,12 @@ export default {
       ninSchoolWorkersPrice: '',
       cexamAddress: '',
       cexamTitle: '',
+      userid: '',
       texamBeginTime: '',
       cStudentNo: '',
       texamEndTime: '',
       // 学号是否可编辑（老师端可以编辑true，学生端不可以编辑false）
-      isReadonly: false,
+      isReadonly: '',
       // 学生端是否是在校生
       inSchStudent: '',
       // 单项选择器弹窗是否显示
@@ -350,6 +353,7 @@ export default {
   mounted () {
     document.title = '立即报名'
     this.getAreaList('0')
+    this.isReadonly = this.GlobalVariable.ANDROID_APP === 'student'
     // this.detail = this.$route.params
     this.inSchStudent = sessionStorage.getItem('inSchStudent')
     // this.inSchStudent = 'true' // 测试用的数据
@@ -361,15 +365,15 @@ export default {
     this.texamBeginTime = moment(sessionStorage.getItem('texamBeginTime')).format('YYYY-MM-DD')
     this.texamEndTime = moment(sessionStorage.getItem('texamEndTime')).format('YYYY-MM-DD')
     this.nExamId = sessionStorage.getItem('nexamId')
-    this.cStudentNo = sessionStorage.getItem('cStudentNo')
-    // this.cropperInit() // 裁剪初始化
+    this.cStudentNo = sessionStorage.getItem('userid')
+    this.cWorkUnit = this.GlobalVariable.ANDROID_APP === 'student' ? '重庆工业职业技术学院' : ''
   },
   methods: {
     // 上传头像
     upload () {
       Dialog.confirm({
         title: '提示',
-        message: `请上传<span style='color:red'>390*567</span>像素的免冠证件照，以免报考失败！`
+        message: `请上传规范的蓝底或白底免冠证件照！`
       })
         .then(() => this.$refs['cropper'].upload())
         .catch(() => {})
@@ -515,38 +519,45 @@ export default {
             switch (type) {
               case 'exam_type':
                 // 学生端(在校生和非在校生)和老师端选择的内容不同
+                // 学号是否可编辑（老师端可以编辑true，学生端不可以编辑false）
                 this.cExamTypeColumns = arrayList.filter(item => {
                   // 学生端
-                  if (that.inSchStudent === 'true' && item.value === '1') {
-                    this.showPrice('1')
-                    this.cExamTypeText = item.text
-                    this.cExamType = item.value
+                  if (this.GlobalVariable.ANDROID_APP !== 'teacher') {
+                    if (that.inSchStudent === 'true' && item.value === '1') {
+                      this.showPrice('1')
+                      this.cExamTypeText = item.text
+                      this.cExamType = item.value
+                      this.cOccupationText = item.text
+                      this.cOccupation = item.value
+                      return true
+                    } else if (that.inSchStudent === 'false' && item.value === '2') {
+                      this.showPrice('1')
+                      this.cExamTypeText = item.text
+                      this.cExamType = item.value
+                      this.cOccupationText = item.text
+                      this.cOccupation = item.value
+                      return true
+                    }
+                  } else if (this.GlobalVariable.ANDROID_APP === 'teacher') {
+                    this.showPrice('4')
                     this.cOccupationText = item.text
                     this.cOccupation = item.value
-                    return true
-                  } else if (that.inSchStudent === 'false' && item.value === '2') {
-                    this.showPrice('1')
                     this.cExamTypeText = item.text
                     this.cExamType = item.value
-                    this.cOccupationText = item.text
-                    this.cOccupation = item.value
-                    return true
+                    return item.value === '4' // 老师端
                   }
-                  // this.showPrice('4')
-                  // this.cOccupationText = item.text
-                  // this.cOccupation = item.value
-                  // this.cExamTypeText = item.text
-                  // this.cExamType = item.value
-                  // return item.value === '4' // 老师端
                 })
                 this.cOccupationColumns = arrayList.filter(item => {
-                  // 学生端
-                  if (that.inSchStudent === 'true' && item.value === '1') {
-                    return true
-                  } else if (that.inSchStudent === 'false' && item.value === '2') {
-                    return true
+                  if (this.GlobalVariable.ANDROID_APP !== 'teacher') {
+                    // 学生端
+                    if (that.inSchStudent === 'true' && item.value === '1') {
+                      return true
+                    } else if (that.inSchStudent === 'false' && item.value === '2') {
+                      return true
+                    }
+                  } else if (this.GlobalVariable.ANDROID_APP === 'teacher') {
+                    return item.value === '4' // 老师端
                   }
-                  // return item.value === '4' // 老师端
                 })
                 break
               case 'sys_user_sex':
@@ -654,19 +665,16 @@ export default {
           this.ninSchoolStudentPriceShow = true
           this.nnotInSchoolStudentPriceShow = false
           this.ninSchoolWorkersPriceShow = false
-          this.isReadonly = true
           break
         case '2':
           this.ninSchoolStudentPriceShow = false
           this.nnotInSchoolStudentPriceShow = true
           this.ninSchoolWorkersPriceShow = false
-          this.isReadonly = true
           break
         case '4':
           this.ninSchoolStudentPriceShow = false
           this.nnotInSchoolStudentPriceShow = false
           this.ninSchoolWorkersPriceShow = true
-          this.isReadonly = false
           break
         default:
           break
@@ -713,6 +721,9 @@ export default {
         return false
       } else if (!this.cExamType) {
         this.$toast('考生类型不能为空')
+        return false
+      } else if (this.nZipCode && !(/\d{6}/.test(this.nZipCode))) {
+        this.$toast('请输入正确的邮政编号')
         return false
       } else {
         return true

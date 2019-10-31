@@ -1,3 +1,9 @@
+/*
+ * @Author: fengbozhang
+ * @Date: 2019-10-09 10:37:31
+ * @LastEditors: fengbozhang
+ * @LastEditTime: 2019-10-21 17:06:08
+ */
 'use strict'
 // Template version: 1.3.1
 // see http://vuejs-templates.github.io/webpack for documentation.
@@ -14,7 +20,7 @@ module.exports = {
     // Various Dev Server settings
     host: '0.0.0.0',
     // host: 'localhost',// can be overwritten by process.env.HOST
-    port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    port: 9292, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,

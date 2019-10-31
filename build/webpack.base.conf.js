@@ -1,3 +1,9 @@
+/*
+ * @Author: fengbozhang
+ * @Date: 2019-10-09 10:37:31
+ * @LastEditors: fengbozhang
+ * @LastEditTime: 2019-10-09 10:37:31
+ */
 'use strict'
 const path = require('path')
 const utils = require('./utils')
@@ -37,7 +43,8 @@ module.exports = {
     alias: {
       vue$: 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      '@uilt': resolve('src/uilt')
+      '@uilt': resolve('src/uilt'),
+      '@comment': resolve('src/comment')
     }
   },
   module: {

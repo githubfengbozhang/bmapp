@@ -1,3 +1,9 @@
+/*
+ * @Author: fengbozhang
+ * @Date: 2019-10-09 10:37:31
+ * @LastEditors: fengbozhang
+ * @LastEditTime: 2019-10-23 17:10:11
+ */
 'use strict'
 const utils = require('./utils')
 const webpack = require('webpack')
@@ -42,7 +48,8 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,
-    }
+    },
+    disableHostCheck: true
   },
   plugins: [
     new webpack.DefinePlugin({

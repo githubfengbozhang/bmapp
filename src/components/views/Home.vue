@@ -2,7 +2,7 @@
  * @Author: fengbozhang
  * @Date: 2019-10-09 10:37:31
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-17 14:59:42
+ * @LastEditTime: 2019-10-31 14:28:51
  -->
 <template>
     <div class='firstpage'>
@@ -65,7 +65,6 @@ export default {
       function_id: this.$route.query.function_id,
       authTime: this.$route.query.authTime,
       ticket: this.$route.query.ticket,
-      cStudentNo: this.$route.query.cStudentNo,
       inSchStudent: '' // 是否是在校生
     }
   },
@@ -74,6 +73,7 @@ export default {
     this.getcheckExam() // 是否可以报考
     this.isStudent() // 学生进入是什么身份
     this.noticeList() // 通知公告
+    console.log('本机')
   },
   methods: {
     toNoticeList () {
@@ -144,7 +144,7 @@ export default {
         nnotInSchoolStudentPrice: this.nnotInSchoolStudentPrice,
         nexamId: this.nexamId,
         inSchStudent: this.inSchStudent,
-        cStudentNo: this.cStudentNo,
+        userid: this.userid,
         cexamTitle: this.cexamTitle,
         texamEndTime: this.texamEndTime,
         texamBeginTime: this.texamBeginTime

@@ -126,7 +126,6 @@ export default {
           if (data.code === 0) {
             this.$router.push({name: 'Result', params: data.data})
           } else {
-            this.$toast(data.msg)
             Dialog.alert({
               title: '温馨提示',
               message: data.msg
