@@ -119,8 +119,8 @@
       />
       <van-field
         v-model="cStudentNo"
-        label="学号"
-        placeholder="请输入学生证学号"
+        :label="this.GlobalVariable.ANDROID_APP === 'teacher' ? '工号' : '学号'"
+        :placeholder="this.GlobalVariable.ANDROID_APP === 'teacher' ? '请输入工号' : '请输入学生证学号'"
         clearable
         :readonly='isReadonly'
       />

@@ -97,13 +97,20 @@ export default {
     init () {
       let cropperImg = this.$refs['cropperImg']
       this.cropper = new Cropper(cropperImg, {
-        aspectRatio: 12 / 16,
+        // aspectRatio: 12 / 16,
         dragMode: 'move',
-        viewMode: 1,
+        viewMode: 3,
         movable: true, // 是否允许可以移动后面的图片
         touchDragZoom: true, // 是否允许通过触摸移动来缩放图片。
         zoomable: true, // 是否允许放大图像。
-        cropBoxResizable: false
+        cropBoxResizable: false,
+        // minCanvasWidth: 390,
+        // minCanvasHeight: 567,
+        strict: false
+      })
+      this.cropper.setCroppedCanvas({
+        width: 390,
+        height: 567
       })
     },
     barcodeCallback () {
