@@ -2,7 +2,7 @@
  * @Author: fengbozhang
  * @Date: 2019-10-15 12:54:12
  * @LastEditors: fengbozhang
- * @LastEditTime: 2019-10-24 16:18:32
+ * @LastEditTime: 2019-11-06 18:43:50
  -->
 <template>
   <div class="v-simple-cropper">
@@ -99,19 +99,18 @@ export default {
       this.cropper = new Cropper(cropperImg, {
         // aspectRatio: 12 / 16,
         dragMode: 'move',
-        viewMode: 3,
+        viewMode: 0,
         movable: true, // 是否允许可以移动后面的图片
-        touchDragZoom: true, // 是否允许通过触摸移动来缩放图片。
+        scalable: true, // 是否允许通过触摸移动来缩放图片。
+        zoomOnTouch: true,
         zoomable: true, // 是否允许放大图像。
         cropBoxResizable: false,
+        minCropBoxWidth: 390,
+        minCropBoxHeight: 567
         // minCanvasWidth: 390,
         // minCanvasHeight: 567,
-        strict: false
       })
-      this.cropper.setCroppedCanvas({
-        width: 390,
-        height: 567
-      })
+      // this.cropper.setCropBoxData({'width': 390, 'height': 567})
     },
     barcodeCallback () {
       console.log('返回摄像1')
