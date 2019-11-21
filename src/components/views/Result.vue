@@ -106,15 +106,21 @@
         disabled
         />
    </van-cell-group>
+   <van-button v-if="status === '3'||status === '5'" safe-area-inset-bottom type="info" :loading = 'loadingShow' loading-text="前往编辑..." size='large' @click="edit()">编辑</van-button>
   </div>
 </template>
 <script>
 import momey from '@uilt/momey'
-import { ImagePreview } from 'vant'
+import { ImagePreview, Dialog } from 'vant'
+// import axios from 'axios'
+// import api from '@comment/api'
+// import qs from 'qs'
+
 export default {
   name: 'result',
   data () {
     return {
+      loadingShow: false,
       file: '',
       cname: '',
       sex: '',
@@ -135,7 +141,9 @@ export default {
       cfractionGrade: '',
       creject: '',
       data: {},
-      instance_before: ''
+      instance_before: '',
+      nexamId: '',
+      status: ''
     }
   },
   mounted () {
@@ -160,6 +168,9 @@ export default {
     this.payStatusName = this.data.params.payStatusName
     this.statusName = this.data.params.statusName
     this.examType = this.data.params.examType
+    this.nexamId = this.data.params.nexamId
+    this.status = this.data.status
+    this.alert()
   },
   beforeRouteLeave (to, from, next) {
     if (this.instance_before) {
@@ -168,6 +179,26 @@ export default {
     next()
   },
   methods: {
+    alert () {
+      if (this.status === '3' || this.status === '5') {
+        Dialog.alert({
+          title: '退回原因',
+          message: `${this.creject},请重新编辑报名信息`
+        })
+      }
+    },
+    edit () {
+      this.loadingShow = true
+      const {
+        cidCard,
+        nexamId
+      } = this.$route.params
+      this.$router.push({name: 'EditExamination',
+        params: {
+          cidCard, nexamId
+        }})
+      this.loadingShow = false
+    },
     openImage () {
       this.instance_before = ImagePreview({
         images: [
@@ -179,13 +210,18 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss" scoped>
   /* .van-image{
     max-height: 4rem;
   } */
   /* .van-image img{
       max-height: 4rem;
   } */
+  .van-button{
+    position: fixed !important;
+    bottom: 1px;
+    display: block;
+  }
   .van-field__control:disabled {
     color: #2a2a2a !important;
     -webkit-text-fill-color: #2a2a2a !important;

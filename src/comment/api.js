@@ -4,9 +4,10 @@
  * @LastEditors: fengbozhang
  * @LastEditTime: 2019-10-24 15:24:05
  */
-// const server = 'http://121.196.200.183:8080/school'
-const server = 'http://183.230.255.84:9292/pth'
-// const server = 'http://g2mdw2.natappfree.cc/pth'
+// const server = 'http://121.196.200.183:8080/school' // 云地址
+// const server = 'http://183.230.255.84:9292/pth' // 线上地址
+const server = 'http://8zhuki.natappfree.cc/pth' // 赵奎本地
+
 const api = {
   signUpSave: `${server}/api/school/sign/save`, // 新增报名信息
   querySignUp: `${server}/api/school/sign/querySignUp`, // 报名信息查询

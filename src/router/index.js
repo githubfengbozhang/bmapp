@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Home from '@/components/views/Home'
 import Examination from '@/components/views/Examination'
+import EditExamination from '@/components/views/EditExamination'
 import QueryResult from '@/components/views/QueryResult'
 import Result from '@/components/views/Result'
 import Notice from '@/components/views/Notice'
@@ -27,6 +28,11 @@ export default new Router({
       path: '/examination',
       name: 'Examination',
       component: Examination
+    },
+    {
+      path: '/editExamination',
+      name: 'EditExamination',
+      component: EditExamination
     },
     {
       path: '/queryResult',
