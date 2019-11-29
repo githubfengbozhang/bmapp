@@ -105,12 +105,12 @@ export default {
         zoomOnTouch: true,
         zoomable: true, // 是否允许放大图像。
         cropBoxResizable: false,
-        minCropBoxWidth: 390,
-        minCropBoxHeight: 567
+        minCropBoxWidth: 50,
+        minCropBoxHeight: 67
         // minCanvasWidth: 390,
         // minCanvasHeight: 567,
       })
-      // this.cropper.setCropBoxData({'width': 390, 'height': 567})
+      // this.cropper.setData({'width': 390, 'height': 567})
     },
     barcodeCallback () {
       console.log('返回摄像1')

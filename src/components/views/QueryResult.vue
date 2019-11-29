@@ -84,12 +84,12 @@ export default {
             data.data.map((item) => {
               this.pickColumns.push({'text': item.dictLabel, 'value': item.dictValue})
             })
-            data.data.map((item, index) => {
-              if (index === 0) {
-                this.nExamText = item.dictLabel
-                this.nExamId = item.dictValue
-              }
-            })
+            // data.data.map((item, index) => {
+            //   if (index === 0) {
+            //     this.nExamText = item.dictLabel
+            //     this.nExamId = item.dictValue
+            //   }
+            // })
           }
         })
     },

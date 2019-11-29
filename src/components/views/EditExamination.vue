@@ -93,12 +93,11 @@
       />
       <van-field
         readonly
-        clickable
         :value="cOccupationText"
         label="职业"
         placeholder="请选择职业"
-        @click="openPicker('cOccupation')"
         required
+        disabled
       />
       <van-field
         v-model="cStudentNo"
@@ -199,6 +198,7 @@
 </template>
 <script>
 import Vue from 'vue'
+// import _ from 'lodash'
 import SimpleCropper from '../views/cropper'
 // import setSession, { sessionStorage } from '@comment/sessionStorage'
 // import Cropper from 'cropperjs'
@@ -290,6 +290,9 @@ export default {
         city_list: {},
         county_list: {}
       },
+      province_list: {},
+      city_list: {},
+      county_list: {},
       // 计划详情
       detail: {},
       data: {}
@@ -306,9 +309,13 @@ export default {
     this.cexamAddress = sessionStorage.getItem('cexamAddress')
     this.cexamTitle = sessionStorage.getItem('cexamTitle')
     this.nExamId = sessionStorage.getItem('nexamId')
+
     this.cStudentNo = sessionStorage.getItem('userid')
     this.cWorkUnit = this.GlobalVariable.ANDROID_APP === 'student' ? '重庆工业职业技术学院' : ''
     this.idCardSearch()
+  },
+  create () {
+    alert(this.person.age)
   },
   methods: {
     // 上传头像
@@ -329,37 +336,38 @@ export default {
     },
     // 下拉默认值渲染cExamType
     pickerCExamTypeValue (value) {
-      let newData = this.cExamTypeColumns.filter((item) => {
+      let newData = this.cExamTypeColumns.find((item) => {
         if (item.value === value) {
           return item
         }
       })
-      console.log(newData)
-      return newData.length > 0 ? newData : [ {text: '', value: ''} ]
+      return newData
     },
     pickerCSexValue (value) {
-      let newData = this.cSexColumns.filter((item) => {
+      let newData = this.cSexColumns.find((item) => {
         if (item.value === value) {
           return item
         }
       })
-      console.log(newData)
       return newData
     },
     pickerCNationNoValue (value) {
-      let newData = this.cNationNoColumns.filter((item) => {
+      let newData = this.cNationNoColumns.find((item) => {
         if (item.value === value) {
           return item
         }
       })
-      console.log(newData)
       return newData
     },
     pickerPlaceValue (area, city, province) {
-      console.log(this.areaList)
-      let provinceList = this.areaList.province_list[province] || ''
-      let cityList = this.areaList.city_list[city] || ''
-      let countyList = this.areaList.county_list[area] || ''
+      console.log(this.county_list)
+      // console.log(this.areaList.city_list[city])
+      // console.log(this.areaList.county_list[area])
+      // console.log(this.areaList.province_list[province])
+      let provinceList = this.province_list[province] || ''
+      let cityList = this.city_list[city] || ''
+      console.log(this.city_list, city, cityList)
+      let countyList = this.county_list[area] || ''
       return provinceList + cityList + countyList
     },
     // 身份证查询信息
@@ -379,7 +387,7 @@ export default {
             })
             this.overlayShow = false
             this.cAddress = data.data.data.caddress
-            this.cSexText = this.pickerCSexValue(data.data.data.csex)[0].text
+            this.cSexText = this.pickerCSexValue(data.data.data.csex).text
             this.cSex = data.data.data.csex
             this.cWorkUnit = data.data.data.cworkUnit
             this.cBranchName = data.data.data.cbranchName
@@ -390,7 +398,7 @@ export default {
             this.cName = data.data.data.cname
             this.cIdCard = data.data.data.cidCard
             this.cPhone = data.data.data.cphone
-            this.cNationNoText = this.pickerCNationNoValue(data.data.data.cnationNo)[0].text
+            this.cNationNoText = this.pickerCNationNoValue(data.data.data.cnationNo).text
             this.cNationNo = data.data.data.cnationNo
             this.cOccupation = data.data.data.coccupation
             this.cOccupationText = data.data.data.coccupation // 职业返回的是文字
@@ -399,7 +407,7 @@ export default {
             this.cIdCardImg = data.data.data.cidCardImg
             this.file = data.data.data.cidCardImg
             this.cExamType = data.data.data.cexamType
-            this.cExamTypeText = this.pickerCExamTypeValue(data.data.data.cexamType)[0].text
+            this.cExamTypeText = this.pickerCExamTypeValue(data.data.data.cexamType).text
             this.cBirthArea = data.data.data.cbirthArea
             this.cBirthCity = data.data.data.cbirthCity
             this.cBirthProvince = data.data.data.cbirthProvince
@@ -423,8 +431,13 @@ export default {
         .then((data) => {
           data.data.map((item, index) => {
             this.areaList.province_list[item.areaCode] = item.areaName
+            // this.province_list[item.areaCode] = item.areaName
+            this.$set(this.province_list, item.areaCode, item.areaName)
             this.getAreaChild(item.areaCode)
           })
+        })
+        .catch((error) => {
+          console.log(error)
         })
     },
     getAreaChild (code) {
@@ -432,6 +445,10 @@ export default {
         .then((data) => {
           data.data.map((item, index) => {
             this.areaList.city_list[item.id] = item.name
+            // this.city_list = Object.assign({}, item)
+            // this.city_list[item.id] = item.name
+            this.$set(this.city_list, item.id + '', item.name)
+            this.$forceUpdate()
             this.getCountyList(item.children ? item.children : [])
           })
         })
@@ -440,11 +457,15 @@ export default {
     getCountyList (children) {
       children.map((item, index) => {
         this.areaList.county_list[item.id] = item.name
+        this.$set(this.county_list, item.id + '', item.name)
+        this.$forceUpdate()
+
+        // this.county_list[item.id] = item.name
       })
+      // console.log(_.cloneDeep(this.areaList.county_list))
     },
     // 枚举下拉
     getDict (type) {
-      let that = this
       return axiosGet(`${api.getDict}?dictType=${type}`)
         .then((data) => {
           if (data.code === 0) {
@@ -456,45 +477,8 @@ export default {
               case 'exam_type':
                 // 学生端(在校生和非在校生)和老师端选择的内容不同
                 // 学号是否可编辑（老师端可以编辑true，学生端不可以编辑false）
-                this.cExamTypeColumns = arrayList.filter(item => {
-                  // 学生端
-                  if (this.GlobalVariable.ANDROID_APP !== 'teacher') {
-                    if (that.inSchStudent === 'true' && item.value === '1') {
-                      this.showPrice('1')
-                      this.cExamTypeText = item.text
-                      this.cExamType = item.value
-                      this.cOccupationText = item.text
-                      this.cOccupation = item.value
-                      return true
-                    } else if (that.inSchStudent === 'false' && item.value === '2') {
-                      this.showPrice('1')
-                      this.cExamTypeText = item.text
-                      this.cExamType = item.value
-                      this.cOccupationText = item.text
-                      this.cOccupation = item.value
-                      return true
-                    }
-                  } else if (this.GlobalVariable.ANDROID_APP === 'teacher') {
-                    this.showPrice('4')
-                    this.cOccupationText = item.text
-                    this.cOccupation = item.value
-                    this.cExamTypeText = item.text
-                    this.cExamType = item.value
-                    return item.value === '4' // 老师端
-                  }
-                })
-                this.cOccupationColumns = arrayList.filter(item => {
-                  if (this.GlobalVariable.ANDROID_APP !== 'teacher') {
-                    // 学生端
-                    if (that.inSchStudent === 'true' && item.value === '1') {
-                      return true
-                    } else if (that.inSchStudent === 'false' && item.value === '2') {
-                      return true
-                    }
-                  } else if (this.GlobalVariable.ANDROID_APP === 'teacher') {
-                    return item.value === '4' // 老师端
-                  }
-                })
+                this.cExamTypeColumns = arrayList
+                this.cOccupationColumns = arrayList
                 break
               case 'sys_user_sex':
                 this.cSexColumns = arrayList
@@ -511,6 +495,8 @@ export default {
           } else {
             Toast.fail({mask: true}, '服务器出错请联系管理员')
           }
+        }).catch(() => {
+
         })
     },
     // 单类选择器
@@ -695,23 +681,14 @@ export default {
         nExamId: this.data.nexamId
       }))
         .then((data) => {
-          this.loadingShow = false
           if (data.data.code !== 0) {
             this.$toast(data.data.msg)
           } else {
-            this.$router.push({ name: 'QueryResult' })
-            // const payData = {
-            //   cDataSrc: 'APP',
-            //   cTradeNo: data.data.data.ctradeNo,
-            //   nExamId: this.nExamId,
-            //   nPayAmt: data.data.data.npayAmt
-            // }
-            // if (data.data.data.ctradeDes === '已缴费') {
-            //   Toast('您已完成缴费，请您及时参加考试！')
-            // } else {
-            //   setSession(payData)
-            //   this.$router.push({ name: 'Pay' })
-            // }
+            Toast('您已修改成功！')
+            this.loadingShow = false
+            setTimeout(() => {
+              this.$router.push({ name: 'QueryResult' })
+            }, 2000)
           }
         })
     }
